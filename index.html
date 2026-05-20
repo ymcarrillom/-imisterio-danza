@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendario de Danza</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { dp: '#6B21A8', dr: '#BE185D' },
+        fontFamily: { display: ['"Playfair Display"','serif'], sans: ['Inter','sans-serif'] }
+      }}
+    }
+  </script>
+  <style>
+    @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+    @keyframes spin    { to{transform:rotate(360deg)} }
+    .anim-up   { animation: slideUp .25s ease forwards }
+    .anim-fade { animation: fadeIn  .2s  ease forwards }
+    .spin      { animation: spin   .8s  linear infinite }
+    .thin-scroll::-webkit-scrollbar       { width:5px }
+    .thin-scroll::-webkit-scrollbar-track { background:#f1f1f1; border-radius:3px }
+    .thin-scroll::-webkit-scrollbar-thumb { background:#c4b5fd; border-radius:3px }
+  </style>
+</head>
+<body class="bg-[#FAF8F5] min-h-screen font-sans text-gray-800">
+
+  <!-- TOASTS -->
+  <div id="toasts" class="fixed top-4 right-4 z-[999] flex flex-col gap-2 w-72 pointer-events-none"></div>
+
+  <!-- ══════════════════════════════════════════
+       VISTA PÚBLICA — CALENDARIO
+  ══════════════════════════════════════════ -->
+  <div id="publicView">
+    <header class="bg-gradient-to-r from-purple-950 via-dp to-purple-800 shadow-lg">
+      <div class="max-w-5xl mx-auto px-4 py-5 flex items-center justify-between">
+        <div>
+          <h1 class="font-display text-white text-2xl md:text-3xl font-bold tracking-wide">Calendario de Danza</h1>
+          <p class="text-purple-200 text-sm mt-0.5 font-light">Uniformes & Peinados — Grupo de Danza</p>
+        </div>
+        <button onclick="openLogin()"
+          class="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 text-white text-sm font-medium px-4 py-2 rounded-full transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          <span>Coordinadora</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="max-w-5xl mx-auto px-4 mt-6 flex items-center justify-between">
+      <button onclick="changeMonth(-1)" class="p-2.5 rounded-full hover:bg-purple-100 text-dp transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <h2 id="monthTitle" class="font-display text-dp text-xl md:text-2xl font-semibold capitalize"></h2>
+      <button onclick="changeMonth(1)" class="p-2.5 rounded-full hover:bg-purple-100 text-dp transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <main class="max-w-5xl mx-auto px-4 mt-4 pb-12">
+      <div class="bg-white rounded-2xl shadow-sm border border-purple-100 overflow-hidden">
+        <div class="grid grid-cols-7 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100">
+          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Dom</div>
+          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Lun</div>
+          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Mar</div>
+          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Mié</div>
+          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Jue</div>
+          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Vie</div>
+          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Sáb</div>
+        </div>
+        <div id="calGrid" class="grid grid-cols-7 gap-px bg-purple-100"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       VISTA ADMIN — PANTALLA COMPLETA
+  ══════════════════════════════════════════ -->
+  <div id="adminView" class="hidden fixed inset-0 z-40 flex anim-fade">
+
+    <!-- Sidebar -->
+    <aside class="w-60 shrink-0 bg-gradient-to-b from-purple-950 to-dp flex flex-col">
+      <div class="px-6 py-6 border-b border-white/10">
+        <p class="text-purple-300 text-xs uppercase tracking-widest font-medium mb-1">Panel Admin</p>
+        <h2 class="font-display text-white text-xl font-bold">Coordinadora</h2>
+        <p class="text-purple-300 text-xs mt-1">Grupo de Danza</p>
+      </div>
+
+      <nav class="flex-1 px-3 py-5 space-y-1">
+        <button class="nav-btn w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-white text-dp shadow-sm" data-tab="programar" onclick="switchAdminTab('programar')">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Programar Días
+        </button>
+        <button class="nav-btn w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-purple-200 hover:bg-white/10" data-tab="outfits" onclick="switchAdminTab('outfits')">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+          Uniformes
+        </button>
+        <button class="nav-btn w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-purple-200 hover:bg-white/10" data-tab="peinados" onclick="switchAdminTab('peinados')">
+          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Peinados
+        </button>
+      </nav>
+
+      <div class="px-3 pb-6">
+        <button onclick="closeAdmin()"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-purple-300 hover:bg-white/10 hover:text-white text-sm font-medium transition-all">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg>
+          Ver Calendario
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="flex-1 flex flex-col bg-[#F4F0FB] overflow-hidden">
+      <div class="bg-white border-b border-gray-100 px-8 py-4 flex items-center justify-between shrink-0">
+        <div>
+          <h3 id="adminTabTitle" class="font-display text-xl font-semibold text-gray-800">Programar Días</h3>
+          <p id="adminTabDesc" class="text-gray-400 text-sm mt-0.5">Asigna uniforme y peinado a cada fecha</p>
+        </div>
+        <div class="flex items-center gap-2 text-sm text-gray-400">
+          <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+          Conectado
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto thin-scroll p-8">
+
+        <!-- TAB: PROGRAMAR -->
+        <div id="tab-programar">
+          <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+            <!-- Col 1: fecha + resumen -->
+            <div class="space-y-5">
+              <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                  <span class="w-7 h-7 rounded-full bg-purple-100 text-dp flex items-center justify-center text-xs font-bold">1</span>
+                  Selecciona la fecha
+                </h4>
+                <input type="date" id="schedDate"
+                  class="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 bg-gray-50"
+                  onchange="onDateChange(this.value)">
+                <div id="datePreview" class="hidden mt-4 p-3 bg-purple-50 rounded-xl border border-purple-100">
+                  <p class="text-xs font-semibold text-dp uppercase tracking-wide mb-1">Fecha seleccionada</p>
+                  <p id="datePreviewTxt" class="text-gray-700 text-sm font-medium capitalize"></p>
+                  <div id="existingBadge" class="hidden mt-2 inline-flex items-center gap-1 bg-amber-100 text-amber-700 text-xs font-semibold px-2 py-1 rounded-full">
+                    ⚠ Ya tiene programación
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <h4 class="font-semibold text-gray-700 mb-4">Resumen</h4>
+                <div class="space-y-3">
+                  <div class="flex items-center gap-3 p-3 bg-purple-50 rounded-xl">
+                    <div id="summaryOutfitImg" class="w-10 h-10 rounded-lg overflow-hidden bg-purple-100 shrink-0 flex items-center justify-center text-xl">👗</div>
+                    <div>
+                      <p class="text-xs text-gray-400 font-medium">Uniforme</p>
+                      <p id="summaryOutfitName" class="text-sm font-semibold text-gray-700">Sin seleccionar</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 p-3 bg-pink-50 rounded-xl">
+                    <div id="summaryHairImg" class="w-10 h-10 rounded-lg overflow-hidden bg-pink-100 shrink-0 flex items-center justify-center text-xl">💇</div>
+                    <div>
+                      <p class="text-xs text-gray-400 font-medium">Peinado</p>
+                      <p id="summaryHairName" class="text-sm font-semibold text-gray-700">Sin seleccionar</p>
+                    </div>
+                  </div>
+                </div>
+                <button onclick="saveSchedule()"
+                  class="w-full mt-5 bg-dp hover:bg-purple-900 text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  Publicar Día
+                </button>
+                <button id="btnClearDay" onclick="clearDay()"
+                  class="hidden w-full mt-2 border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 text-sm font-semibold py-2.5 rounded-xl transition-colors">
+                  Eliminar programación
+                </button>
+              </div>
+            </div>
+
+            <!-- Col 2: uniformes -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h4 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-purple-100 text-dp flex items-center justify-center text-xs font-bold">2</span>
+                Elige Uniforme
+              </h4>
+              <div id="pickerOutfits" class="grid grid-cols-2 gap-3 max-h-[65vh] overflow-y-auto thin-scroll pr-1"></div>
+            </div>
+
+            <!-- Col 3: peinados -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h4 class="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-pink-100 text-dr flex items-center justify-center text-xs font-bold">3</span>
+                Elige Peinado
+              </h4>
+              <div id="pickerHair" class="grid grid-cols-2 gap-3 max-h-[65vh] overflow-y-auto thin-scroll pr-1"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: UNIFORMES -->
+        <div id="tab-outfits" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h4 class="font-semibold text-gray-700 mb-5 text-lg">Registrar Nuevo Uniforme</h4>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Nombre</label>
+                  <input type="text" id="outfitNombre" placeholder="Ej: Jean Negro + Body Blanco"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 bg-gray-50">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Archivo de imagen</label>
+                  <input type="text" id="outfitImagen" placeholder="jean-negro.jpg"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 bg-gray-50">
+                  <p class="text-xs text-gray-400 mt-1.5">Archivo en la carpeta <code class="bg-gray-100 px-1.5 py-0.5 rounded">/outfits/</code></p>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Recomendaciones (opcional)</label>
+                  <textarea id="outfitRecom" rows="3" placeholder="Medias, zapatillas, accesorios..."
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 bg-gray-50 resize-none"></textarea>
+                </div>
+                <button onclick="saveOutfit()"
+                  class="w-full bg-dp hover:bg-purple-900 text-white font-semibold py-3 rounded-xl transition-colors">
+                  Guardar Uniforme
+                </button>
+              </div>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h4 class="font-semibold text-gray-700 mb-5 text-lg">Biblioteca</h4>
+              <div id="outfitsList" class="space-y-3 max-h-[60vh] overflow-y-auto thin-scroll pr-1"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: PEINADOS -->
+        <div id="tab-peinados" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h4 class="font-semibold text-gray-700 mb-5 text-lg">Registrar Nuevo Peinado</h4>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Nombre</label>
+                  <input type="text" id="hairNombre" placeholder="Ej: Moño alto con trenzas"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-300 bg-gray-50">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Imagen</label>
+                  <input type="text" id="hairImagen" placeholder="peinado-mono.jpg  ó  https://..."
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-300 bg-gray-50">
+                  <p class="text-xs text-gray-400 mt-1.5">Archivo en <code class="bg-gray-100 px-1.5 py-0.5 rounded">/peinados/</code> o link directo</p>
+                </div>
+                <button onclick="saveHairstyle()"
+                  class="w-full bg-dr hover:bg-pink-800 text-white font-semibold py-3 rounded-xl transition-colors">
+                  Guardar Peinado
+                </button>
+              </div>
+            </div>
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h4 class="font-semibold text-gray-700 mb-5 text-lg">Biblioteca</h4>
+              <div id="hairList" class="space-y-3 max-h-[60vh] overflow-y-auto thin-scroll pr-1"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LOGIN -->
+  <div id="loginModal" class="fixed inset-0 z-50 hidden items-center justify-center">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeLogin()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-4 anim-up">
+      <button onclick="closeLogin()" class="absolute top-4 right-4 p-1.5 rounded-full hover:bg-gray-100 text-gray-400">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+      <div class="text-center mb-6">
+        <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
+          <svg class="w-7 h-7 text-dp" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+        </div>
+        <h3 class="font-display text-xl font-semibold text-gray-800">Acceso Coordinadora</h3>
+        <p class="text-gray-400 text-sm mt-1">Ingresa la contraseña para continuar</p>
+      </div>
+      <div class="space-y-4">
+        <div class="relative">
+          <input type="password" id="loginPwd" placeholder="Contraseña"
+            class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 pr-10"
+            onkeydown="if(event.key==='Enter') submitLogin()">
+          <button onclick="togglePwdVis()" tabindex="-1" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+          </button>
+        </div>
+        <p id="loginErr" class="hidden text-red-500 text-sm text-center bg-red-50 py-2 px-3 rounded-xl"></p>
+        <button onclick="submitLogin()" id="loginBtn"
+          class="w-full bg-dp hover:bg-purple-900 text-white font-semibold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2">
+          Ingresar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DETALLE DÍA -->
+  <div id="dayModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeDay()"></div>
+    <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg anim-up overflow-hidden max-h-[90vh] overflow-y-auto thin-scroll">
+      <div class="bg-gradient-to-r from-purple-950 to-dp px-6 py-5">
+        <button onclick="closeDay()" class="absolute top-4 right-4 p-1.5 rounded-full bg-white/20 hover:bg-white/30 text-white">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <p class="text-purple-300 text-xs uppercase tracking-widest font-medium">Programación</p>
+        <h2 id="mDate" class="font-display text-white text-2xl font-bold mt-0.5 capitalize"></h2>
+      </div>
+      <div class="p-6">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="bg-purple-50 rounded-xl p-3 text-center">
+            <p class="text-xs font-semibold text-dp uppercase tracking-wide mb-2">Vestuario</p>
+            <img id="mOutfitImg" class="w-full h-44 object-cover rounded-lg bg-purple-100">
+            <p id="mOutfitName" class="font-semibold text-gray-800 text-sm mt-2"></p>
+          </div>
+          <div class="bg-pink-50 rounded-xl p-3 text-center">
+            <p class="text-xs font-semibold text-dr uppercase tracking-wide mb-2">Peinado</p>
+            <img id="mHairImg" class="w-full h-44 object-cover rounded-lg bg-pink-100">
+            <p id="mHairName" class="font-semibold text-gray-800 text-sm mt-2"></p>
+          </div>
+        </div>
+        <div id="mRecomBlock" class="hidden bg-amber-50 border border-amber-100 rounded-xl p-4">
+          <p class="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-1">Recomendaciones</p>
+          <p id="mRecom" class="text-gray-700 text-sm leading-relaxed"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPINNER -->
+  <div id="spinner" class="fixed inset-0 z-30 bg-[#FAF8F5]/80 hidden items-center justify-center">
+    <div class="text-center">
+      <div class="w-10 h-10 border-4 border-dp border-t-transparent rounded-full spin mx-auto mb-3"></div>
+      <p class="text-dp font-medium text-sm">Cargando…</p>
+    </div>
+  </div>
+
+  <script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbz7l2OaPxunkizDURPME_OnMNMhAIEUVbW3C5PSERK96m33FZEp5DsrIi3Kw6k7Pkz-/exec';
+    const OUTFITS_PATH  = './outfits/';
+    const PEINADOS_PATH = './peinados/';
+
+    const S = {
+      isAdmin: false,
+      year:  new Date().getFullYear(),
+      month: new Date().getMonth(),
+      outfits: [], hairstyles: [], calendar: {},
+      pickerOutfit: null, pickerHair: null,
+    };
+
+    // API
+    async function api(action, data = {}) {
+      const writes = ['login','addOutfit','addHairstyle','saveDay','deleteDay'];
+      if (writes.includes(action)) {
+        const res = await fetch(GAS_URL, { method:'POST', body: JSON.stringify({ action, ...data }) });
+        return res.json();
+      }
+      const url = new URL(GAS_URL);
+      url.searchParams.set('action', action);
+      Object.entries(data).forEach(([k,v]) => url.searchParams.set(k,v));
+      return (await fetch(url.toString())).json();
+    }
+
+    // Toast
+    function toast(msg, type = 'success') {
+      const colors = { success:'bg-emerald-600', error:'bg-red-500', warning:'bg-amber-500', info:'bg-blue-500' };
+      const icons  = { success:'✓', error:'✕', warning:'⚠', info:'ℹ' };
+      const el = document.createElement('div');
+      el.className = `${colors[type]} text-white text-sm font-medium px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 pointer-events-auto`;
+      el.innerHTML = `<span class="font-bold">${icons[type]}</span><span>${msg}</span>`;
+      document.getElementById('toasts').appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }
+
+    // Helpers
+    function imgSrc(p, folder) { return !p ? '' : p.startsWith('http') ? p : folder + p; }
+    function outfitSrc(p) { return imgSrc(p, OUTFITS_PATH); }
+    function hairSrc(p)   { return imgSrc(p, PEINADOS_PATH); }
+    function formatDate(str) {
+      const [y,m,d] = str.split('-');
+      return new Date(y, m-1, d).toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+    }
+    function show(id) { const e = document.getElementById(id); e.classList.remove('hidden'); e.classList.add('flex'); }
+    function hide(id) { const e = document.getElementById(id); e.classList.add('hidden');    e.classList.remove('flex'); }
+
+    const FB_OUTFIT = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect fill='%23ede9fe' width='40' height='40'/><text y='28' x='8' font-size='22'>%F0%9F%91%97</text></svg>`;
+    const FB_HAIR   = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect fill='%23fce7f3' width='40' height='40'/><text y='28' x='8' font-size='22'>%F0%9F%92%87</text></svg>`;
+
+    // Login
+    function openLogin() { if (S.isAdmin) { openAdmin(); return; } show('loginModal'); setTimeout(() => document.getElementById('loginPwd').focus(), 50); }
+    function closeLogin() { hide('loginModal'); document.getElementById('loginPwd').value=''; document.getElementById('loginErr').classList.add('hidden'); }
+    function togglePwdVis() { const i = document.getElementById('loginPwd'); i.type = i.type==='password' ? 'text' : 'password'; }
+
+    async function submitLogin() {
+      const pwd = document.getElementById('loginPwd').value;
+      if (!pwd) return;
+      const btn = document.getElementById('loginBtn');
+      btn.innerHTML = '<svg class="w-4 h-4 spin" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity=".25"/><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" opacity=".75"/></svg> Verificando…';
+      btn.disabled = true;
+      try {
+        const r = await api('login', { password: pwd });
+        if (r.success) { S.isAdmin = true; closeLogin(); openAdmin(); toast('Acceso concedido', 'success'); }
+        else { const e = document.getElementById('loginErr'); e.textContent='Contraseña incorrecta'; e.classList.remove('hidden'); }
+      } catch {
+        const e = document.getElementById('loginErr'); e.textContent='Error de conexión'; e.classList.remove('hidden');
+      } finally { btn.innerHTML = 'Ingresar'; btn.disabled = false; }
+    }
+
+    // Admin
+    async function openAdmin() {
+      show('spinner');
+      await refreshData();
+      hide('spinner');
+      document.getElementById('publicView').classList.add('hidden');
+      document.getElementById('adminView').classList.remove('hidden');
+      switchAdminTab('programar');
+    }
+    function closeAdmin() {
+      document.getElementById('adminView').classList.add('hidden');
+      document.getElementById('publicView').classList.remove('hidden');
+      renderCalendar();
+    }
+
+    const TAB_META = {
+      programar: { title:'Programar Días',          desc:'Asigna uniforme y peinado a cada fecha' },
+      outfits:   { title:'Biblioteca de Uniformes', desc:'Gestiona los uniformes del grupo' },
+      peinados:  { title:'Biblioteca de Peinados',  desc:'Gestiona los peinados del grupo' },
+    };
+
+    function switchAdminTab(tab) {
+      ['programar','outfits','peinados'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        const btn = document.querySelector(`.nav-btn[data-tab="${t}"]`);
+        btn.className = btn.className
+          .replace('bg-white text-dp shadow-sm','')
+          .replace('text-purple-200 hover:bg-white/10','')
+          .trim() + ' text-purple-200 hover:bg-white/10';
+      });
+      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      const active = document.querySelector(`.nav-btn[data-tab="${tab}"]`);
+      active.className = active.className
+        .replace('text-purple-200 hover:bg-white/10','')
+        .trim() + ' bg-white text-dp shadow-sm';
+      document.getElementById('adminTabTitle').textContent = TAB_META[tab].title;
+      document.getElementById('adminTabDesc').textContent  = TAB_META[tab].desc;
+      if (tab === 'programar') renderPickers();
+      if (tab === 'outfits')   renderLibraryOutfits();
+      if (tab === 'peinados')  renderLibraryHair();
+    }
+
+    // Libraries
+    function renderLibraryOutfits() {
+      document.getElementById('outfitsList').innerHTML = S.outfits.length
+        ? S.outfits.map(o => `
+          <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <img src="${outfitSrc(o.imagen)}" class="w-16 h-16 object-cover rounded-lg bg-purple-100 shrink-0" onerror="this.src='${FB_OUTFIT}'">
+            <div class="min-w-0 flex-1">
+              <p class="font-semibold text-gray-800">${o.nombre}</p>
+              <p class="text-xs text-gray-400 mt-0.5 truncate">${o.imagen}</p>
+              ${o.recomendaciones ? `<p class="text-xs text-gray-500 mt-1 line-clamp-2">${o.recomendaciones}</p>` : ''}
+            </div>
+          </div>`).join('')
+        : '<div class="text-center py-12 text-gray-400"><div class="text-4xl mb-3">👗</div><p class="text-sm">Sin uniformes registrados</p></div>';
+    }
+    function renderLibraryHair() {
+      document.getElementById('hairList').innerHTML = S.hairstyles.length
+        ? S.hairstyles.map(h => `
+          <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <img src="${hairSrc(h.imagen)}" class="w-16 h-16 object-cover rounded-lg bg-pink-100 shrink-0" onerror="this.src='${FB_HAIR}'">
+            <div class="min-w-0">
+              <p class="font-semibold text-gray-800">${h.nombre}</p>
+            </div>
+          </div>`).join('')
+        : '<div class="text-center py-12 text-gray-400"><div class="text-4xl mb-3">💇</div><p class="text-sm">Sin peinados registrados</p></div>';
+    }
+
+    // Pickers
+    function renderPickers() {
+      document.getElementById('pickerOutfits').innerHTML = S.outfits.length
+        ? S.outfits.map(o => `
+          <div id="po-${o.id}" onclick="pickOutfit('${o.id}')"
+            class="border-2 border-transparent rounded-xl p-2 cursor-pointer hover:border-dp bg-purple-50 text-center transition-all">
+            <img src="${outfitSrc(o.imagen)}" class="w-full h-24 object-cover rounded-lg mb-2 bg-purple-100" onerror="this.src='${FB_OUTFIT}'">
+            <p class="text-xs font-medium text-gray-700 leading-snug">${o.nombre}</p>
+          </div>`).join('')
+        : '<p class="col-span-2 text-center text-gray-400 text-sm py-8">Ve a "Uniformes" y registra primero</p>';
+
+      document.getElementById('pickerHair').innerHTML = S.hairstyles.length
+        ? S.hairstyles.map(h => `
+          <div id="ph-${h.id}" onclick="pickHair('${h.id}')"
+            class="border-2 border-transparent rounded-xl p-2 cursor-pointer hover:border-dr bg-pink-50 text-center transition-all">
+            <img src="${hairSrc(h.imagen)}" class="w-full h-24 object-cover rounded-lg mb-2 bg-pink-100" onerror="this.src='${FB_HAIR}'">
+            <p class="text-xs font-medium text-gray-700 leading-snug">${h.nombre}</p>
+          </div>`).join('')
+        : '<p class="col-span-2 text-center text-gray-400 text-sm py-8">Ve a "Peinados" y registra primero</p>';
+    }
+
+    function pickOutfit(id) {
+      document.querySelectorAll('[id^="po-"]').forEach(el => { el.classList.remove('border-dp','bg-purple-100'); el.classList.add('border-transparent','bg-purple-50'); });
+      const el = document.getElementById(`po-${id}`);
+      if (el) { el.classList.replace('border-transparent','border-dp'); el.classList.replace('bg-purple-50','bg-purple-100'); }
+      S.pickerOutfit = id;
+      const o = S.outfits.find(x => String(x.id)===String(id));
+      if (o) {
+        document.getElementById('summaryOutfitName').textContent = o.nombre;
+        document.getElementById('summaryOutfitImg').innerHTML = `<img src="${outfitSrc(o.imagen)}" class="w-full h-full object-cover" onerror="this.src='${FB_OUTFIT}'">`;
+      }
+    }
+    function pickHair(id) {
+      document.querySelectorAll('[id^="ph-"]').forEach(el => { el.classList.remove('border-dr','bg-pink-100'); el.classList.add('border-transparent','bg-pink-50'); });
+      const el = document.getElementById(`ph-${id}`);
+      if (el) { el.classList.replace('border-transparent','border-dr'); el.classList.replace('bg-pink-50','bg-pink-100'); }
+      S.pickerHair = id;
+      const h = S.hairstyles.find(x => String(x.id)===String(id));
+      if (h) {
+        document.getElementById('summaryHairName').textContent = h.nombre;
+        document.getElementById('summaryHairImg').innerHTML = `<img src="${hairSrc(h.imagen)}" class="w-full h-full object-cover" onerror="this.src='${FB_HAIR}'">`;
+      }
+    }
+
+    function onDateChange(date) {
+      S.pickerOutfit = null; S.pickerHair = null;
+      document.querySelectorAll('[id^="po-"]').forEach(el => { el.classList.remove('border-dp','bg-purple-100'); el.classList.add('border-transparent','bg-purple-50'); });
+      document.querySelectorAll('[id^="ph-"]').forEach(el => { el.classList.remove('border-dr','bg-pink-100'); el.classList.add('border-transparent','bg-pink-50'); });
+      document.getElementById('summaryOutfitName').textContent = 'Sin seleccionar';
+      document.getElementById('summaryHairName').textContent   = 'Sin seleccionar';
+      document.getElementById('summaryOutfitImg').innerHTML = '<div class="w-full h-full flex items-center justify-center text-xl">👗</div>';
+      document.getElementById('summaryHairImg').innerHTML   = '<div class="w-full h-full flex items-center justify-center text-xl">💇</div>';
+
+      document.getElementById('datePreview').classList.remove('hidden');
+      document.getElementById('datePreviewTxt').textContent = formatDate(date);
+
+      if (S.calendar[date]) {
+        const ev = S.calendar[date];
+        document.getElementById('existingBadge').classList.remove('hidden');
+        document.getElementById('btnClearDay').classList.remove('hidden');
+        if (ev.uniforme_id) pickOutfit(String(ev.uniforme_id));
+        const hair = S.hairstyles.find(h => h.nombre === ev.peinado_nombre);
+        if (hair) pickHair(String(hair.id));
+      } else {
+        document.getElementById('existingBadge').classList.add('hidden');
+        document.getElementById('btnClearDay').classList.add('hidden');
+      }
+    }
+
+    // CRUD
+    async function saveOutfit() {
+      const nombre = document.getElementById('outfitNombre').value.trim();
+      const imagen = document.getElementById('outfitImagen').value.trim();
+      const recom  = document.getElementById('outfitRecom').value.trim();
+      if (!nombre || !imagen) { toast('Nombre e imagen son requeridos','warning'); return; }
+      try {
+        await api('addOutfit', { nombre, imagen, recomendaciones: recom });
+        toast('Uniforme guardado','success');
+        ['outfitNombre','outfitImagen','outfitRecom'].forEach(id => document.getElementById(id).value='');
+        await refreshData(); renderLibraryOutfits(); renderPickers();
+      } catch { toast('Error al guardar uniforme','error'); }
+    }
+    async function saveHairstyle() {
+      const nombre = document.getElementById('hairNombre').value.trim();
+      const imagen = document.getElementById('hairImagen').value.trim();
+      if (!nombre || !imagen) { toast('Nombre e imagen son requeridos','warning'); return; }
+      try {
+        await api('addHairstyle', { nombre, imagen });
+        toast('Peinado guardado','success');
+        ['hairNombre','hairImagen'].forEach(id => document.getElementById(id).value='');
+        await refreshData(); renderLibraryHair(); renderPickers();
+      } catch { toast('Error al guardar peinado','error'); }
+    }
+    async function saveSchedule() {
+      const date = document.getElementById('schedDate').value;
+      if (!date)            { toast('Selecciona una fecha','warning'); return; }
+      if (!S.pickerOutfit)  { toast('Selecciona un uniforme','warning'); return; }
+      if (!S.pickerHair)    { toast('Selecciona un peinado','warning'); return; }
+      const outfit = S.outfits.find(o => String(o.id)===String(S.pickerOutfit));
+      const hair   = S.hairstyles.find(h => String(h.id)===String(S.pickerHair));
+      try {
+        await api('saveDay', {
+          fecha: date,
+          uniforme_id: outfit.id, uniforme_nombre: outfit.nombre,
+          uniforme_imagen: outfit.imagen, uniforme_recomendaciones: outfit.recomendaciones||'',
+          peinado_nombre: hair.nombre, peinado_imagen: hair.imagen,
+        });
+        toast('¡Día programado exitosamente!','success');
+        await refreshData();
+        document.getElementById('existingBadge').classList.remove('hidden');
+        document.getElementById('btnClearDay').classList.remove('hidden');
+      } catch { toast('Error al programar el día','error'); }
+    }
+    async function clearDay() {
+      const date = document.getElementById('schedDate').value;
+      if (!date) return;
+      if (!confirm(`¿Eliminar la programación del ${formatDate(date)}?`)) return;
+      try {
+        await api('deleteDay', { fecha: date });
+        toast('Programación eliminada','info');
+        delete S.calendar[date];
+        document.getElementById('existingBadge').classList.add('hidden');
+        document.getElementById('btnClearDay').classList.add('hidden');
+      } catch { toast('Error al eliminar','error'); }
+    }
+
+    // Data
+    async function refreshData() {
+      const monthKey = `${S.year}-${String(S.month+1).padStart(2,'0')}`;
+      const [outfits, hairstyles, calendar] = await Promise.all([
+        api('getOutfits'), api('getHairstyles'), api('getCalendar', { month: monthKey }),
+      ]);
+      S.outfits    = Array.isArray(outfits)    ? outfits    : [];
+      S.hairstyles = Array.isArray(hairstyles) ? hairstyles : [];
+      S.calendar   = (calendar && typeof calendar==='object') ? calendar : {};
+    }
+
+    // Calendar
+    const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    function renderCalendar() {
+      document.getElementById('monthTitle').textContent = `${MONTHS[S.month]} ${S.year}`;
+      const grid = document.getElementById('calGrid');
+      grid.innerHTML = '';
+      const firstDay = new Date(S.year, S.month, 1).getDay();
+      const days     = new Date(S.year, S.month+1, 0).getDate();
+      const today    = new Date();
+      const isNow    = today.getMonth()===S.month && today.getFullYear()===S.year;
+      for (let i=0; i<firstDay; i++) { const c=document.createElement('div'); c.className='bg-gray-50/40 min-h-32 md:min-h-36'; grid.appendChild(c); }
+      for (let d=1; d<=days; d++) {
+        const key = `${S.year}-${String(S.month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+        const ev  = S.calendar[key];
+        const isToday = isNow && today.getDate()===d;
+        const cell = document.createElement('div');
+        cell.className = `bg-white min-h-32 md:min-h-36 p-2 flex flex-col transition-all duration-200 ${ev?'cursor-pointer hover:shadow-md hover:-translate-y-0.5 group':''}`;
+        if (ev) cell.onclick = () => openDay(key);
+        cell.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="${isToday?'w-7 h-7 rounded-full bg-dp text-white flex items-center justify-center text-sm font-bold':'text-sm font-semibold text-gray-400'}">${d}</span>
+            ${ev?'<span class="w-2 h-2 rounded-full bg-dp/50 group-hover:bg-dp transition-colors"></span>':''}
+          </div>
+          ${ev?`<div class="flex-1 flex flex-col gap-1 mt-1.5 overflow-hidden">
+            <div class="rounded-lg overflow-hidden flex-1 min-h-[4.5rem]">
+              <img src="${outfitSrc(ev.uniforme_imagen)}" class="w-full h-full object-cover"
+                onerror="this.parentElement.innerHTML='<div class=\\'h-full min-h-16 bg-purple-100 flex items-center justify-center text-2xl\\'>👗</div>'">
+            </div>
+            <div class="bg-pink-50 rounded px-1.5 py-1">
+              <p class="text-xs font-medium text-pink-600 truncate text-center leading-tight">${ev.peinado_nombre}</p>
+            </div>
+          </div>`:''}`;
+        grid.appendChild(cell);
+      }
+    }
+
+    function changeMonth(delta) {
+      S.month += delta;
+      if (S.month>11) { S.month=0; S.year++; }
+      if (S.month<0)  { S.month=11; S.year--; }
+      loadAndRender();
+    }
+    async function loadAndRender() {
+      show('spinner');
+      try { await refreshData(); renderCalendar(); }
+      catch { toast('Error al cargar datos','error'); renderCalendar(); }
+      finally { hide('spinner'); }
+    }
+
+    // Day modal
+    function openDay(key) {
+      const ev = S.calendar[key];
+      if (!ev) return;
+      document.getElementById('mDate').textContent       = formatDate(key);
+      document.getElementById('mOutfitName').textContent = ev.uniforme_nombre;
+      document.getElementById('mHairName').textContent   = ev.peinado_nombre;
+      document.getElementById('mOutfitImg').src = outfitSrc(ev.uniforme_imagen);
+      document.getElementById('mHairImg').src   = hairSrc(ev.peinado_imagen);
+      const rb = document.getElementById('mRecomBlock');
+      if (ev.uniforme_recomendaciones) { document.getElementById('mRecom').textContent=ev.uniforme_recomendaciones; rb.classList.remove('hidden'); }
+      else rb.classList.add('hidden');
+      show('dayModal');
+    }
+    function closeDay() { hide('dayModal'); }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('schedDate').value = new Date().toISOString().split('T')[0];
+      loadAndRender();
+    });
+    document.addEventListener('keydown', e => { if (e.key==='Escape') { closeDay(); closeLogin(); } });
+  </script>
+</body>
+</html>

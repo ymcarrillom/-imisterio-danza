@@ -1,0 +1,5 @@
+Coloca aquí las fotos de los uniformes.
+Formatos aceptados: .jpg, .jpeg, .png, .webp
+
+Ejemplo: jean-negro.jpg
+Luego en el panel admin registra el uniforme con ese nombre exacto de archivo.
