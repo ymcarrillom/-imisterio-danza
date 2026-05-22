@@ -28,6 +28,10 @@
     .thin-scroll::-webkit-scrollbar       { width:5px }
     .thin-scroll::-webkit-scrollbar-track { background:#f1f1f1; border-radius:3px }
     .thin-scroll::-webkit-scrollbar-thumb { background:#c4b5fd; border-radius:3px }
+    .img-zoom { transition: transform .7s ease-out; }
+    .img-zoom-wrap:hover .img-zoom { transform: scale(1.05); }
+    @keyframes goldPulse { 0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,0)} 50%{box-shadow:0 0 18px 5px rgba(251,191,36,0.28)} }
+    .director-glow { animation: goldPulse 2.5s ease-in-out infinite; }
   </style>
 </head>
 <body class="bg-[#FAF8F5] min-h-screen font-sans text-gray-800">
@@ -41,9 +45,12 @@
   <div id="publicView">
     <header class="bg-gradient-to-r from-purple-950 via-dp to-purple-800 shadow-lg">
       <div class="max-w-5xl mx-auto px-4 py-5 flex items-center justify-between">
-        <div>
-          <h1 class="font-display text-white text-2xl md:text-3xl font-bold tracking-wide">Calendario de Danza</h1>
-          <p class="text-purple-200 text-sm mt-0.5 font-light">Uniformes & Peinados — Grupo de Danza</p>
+        <div class="flex flex-col gap-1">
+          <img src="./Conexion-C-Nueva-Imagen_Mesa-de-trabajo-1.png"
+               alt="Conexión con el Cielo"
+               class="h-12 w-auto object-contain brightness-0 invert drop-shadow-sm"
+               style="max-width:220px">
+          <p class="text-purple-200/80 text-xs font-light tracking-wide pl-0.5">Calendario · Uniformes &amp; Peinados</p>
         </div>
         <button onclick="openLogin()"
           class="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 text-white text-sm font-medium px-4 py-2 rounded-full transition-all">
@@ -90,9 +97,12 @@
     <!-- Sidebar -->
     <aside class="w-60 shrink-0 bg-gradient-to-b from-purple-950 to-dp flex flex-col">
       <div class="px-6 py-6 border-b border-white/10">
-        <p class="text-purple-300 text-xs uppercase tracking-widest font-medium mb-1">Panel Admin</p>
-        <h2 class="font-display text-white text-xl font-bold">Coordinadora</h2>
-        <p class="text-purple-300 text-xs mt-1">Grupo de Danza</p>
+        <img src="./Conexion-C-Nueva-Imagen_Mesa-de-trabajo-1.png"
+             alt="Conexión con el Cielo"
+             class="h-9 w-auto object-contain brightness-0 invert mb-4"
+             style="max-width:160px">
+        <p class="text-purple-300 text-[10px] uppercase tracking-widest font-semibold mb-0.5">Panel Admin</p>
+        <p class="text-purple-200 text-xs">Coordinadora · Grupo de Danza</p>
       </div>
 
       <nav class="flex-1 px-3 py-5 space-y-1">
@@ -399,75 +409,68 @@
   </div>
 
   <!-- MODAL: DETALLE DÍA -->
-  <div id="dayModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closeDay()"></div>
-    <div class="relative bg-white rounded-3xl shadow-2xl w-full max-w-5xl anim-up overflow-hidden max-h-[92vh] overflow-y-auto thin-scroll">
-      <!-- Header -->
-      <div class="relative bg-gradient-to-br from-purple-950 via-dp to-purple-800 px-10 py-8">
-        <button onclick="closeDay()" class="absolute top-5 right-5 p-2.5 rounded-full bg-white/15 hover:bg-white/30 text-white transition-colors backdrop-blur-sm">
+  <div id="dayModal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 md:p-6">
+    <div class="absolute inset-0 bg-black/75 backdrop-blur-md" onclick="closeDay()"></div>
+    <div class="relative w-full max-w-5xl anim-up overflow-hidden rounded-3xl shadow-2xl flex flex-col" style="height:88vh">
+
+      <!-- HEADER -->
+      <div class="relative bg-gradient-to-br from-[#12003e] via-purple-900 to-purple-700 px-8 py-6 overflow-hidden shrink-0">
+        <div class="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-white/5 pointer-events-none"></div>
+        <div class="absolute -bottom-5 left-1/3 w-60 h-14 bg-purple-400/10 blur-3xl rounded-full pointer-events-none"></div>
+        <img src="./Conexion-C-Nueva-Imagen_Mesa-de-trabajo-1.png"
+             alt="Logo"
+             class="absolute bottom-4 right-8 h-8 w-auto object-contain brightness-0 invert opacity-20 pointer-events-none select-none"
+             style="max-width:140px">
+        <button onclick="closeDay()" class="absolute top-4 right-4 p-2.5 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors backdrop-blur-sm z-10">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
-        <div class="flex items-center gap-3 mb-2">
-          <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        <div class="relative pr-12">
+          <div class="flex items-center gap-2.5 mb-1">
+            <div class="w-0.5 h-4 bg-purple-400 rounded-full"></div>
+            <p class="text-purple-300 text-[10px] uppercase tracking-[0.25em] font-semibold">Programación del día</p>
           </div>
-          <p class="text-purple-200 text-xs uppercase tracking-[0.2em] font-semibold">Programación del día</p>
-        </div>
-        <h2 id="mDate" class="font-display text-white text-3xl md:text-4xl font-bold capitalize leading-tight"></h2>
-        <div id="mDirectorHeader" class="hidden mt-3 inline-flex items-center gap-2 bg-amber-400/20 border border-amber-300/40 backdrop-blur-sm rounded-full px-4 py-1.5">
-          <svg class="w-4 h-4 text-amber-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-          <span class="text-white text-sm font-semibold">Dirige: <span id="mDirectorName"></span></span>
+          <h2 id="mDate" class="font-display text-white text-2xl md:text-3xl font-bold capitalize leading-tight"></h2>
         </div>
       </div>
 
-      <!-- Hero: uniforme + peinado -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-0 border-b border-gray-100">
-        <div class="relative bg-gradient-to-br from-purple-50 to-purple-100 p-6 md:p-8">
-          <div class="flex items-center gap-2 mb-4">
-            <div class="w-7 h-7 rounded-lg bg-dp text-white flex items-center justify-center">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
-            </div>
-            <p class="text-xs font-bold text-dp uppercase tracking-widest">Vestuario</p>
+      <!-- IMÁGENES: ocupa todo el espacio restante -->
+      <div class="flex-1 min-h-0 grid grid-cols-2">
+        <!-- Outfit -->
+        <div class="relative overflow-hidden bg-purple-950 img-zoom-wrap">
+          <img id="mOutfitImg" class="img-zoom absolute inset-0 w-full h-full object-cover object-top"
+            onerror="this.style.display='none'; document.getElementById('mOutfitFallback').classList.remove('hidden')">
+          <div id="mOutfitFallback" class="hidden absolute inset-0 bg-purple-900 flex items-center justify-center text-8xl">👗</div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent pointer-events-none"></div>
+          <div class="absolute inset-x-0 bottom-0 p-5">
+            <span class="inline-block bg-dp/70 backdrop-blur-sm text-purple-100 text-[9px] font-bold uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full mb-1.5">Vestuario</span>
+            <p id="mOutfitName" class="font-display text-white text-lg font-bold leading-snug drop-shadow-lg"></p>
           </div>
-          <div class="aspect-[4/5] rounded-2xl overflow-hidden bg-white shadow-md mb-4 max-h-96 mx-auto" style="max-width: 320px;">
-            <img id="mOutfitImg" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'h-full bg-purple-100 flex items-center justify-center text-6xl\\'>👗</div>'">
-          </div>
-          <p id="mOutfitName" class="font-display font-semibold text-gray-800 text-lg text-center"></p>
         </div>
-        <div class="relative bg-gradient-to-br from-pink-50 to-pink-100 p-6 md:p-8">
-          <div class="flex items-center gap-2 mb-4">
-            <div class="w-7 h-7 rounded-lg bg-dr text-white flex items-center justify-center">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-            <p class="text-xs font-bold text-dr uppercase tracking-widest">Peinado</p>
+        <!-- Peinado -->
+        <div class="relative overflow-hidden bg-pink-950 img-zoom-wrap border-l border-white/10">
+          <div id="mHairWrap" class="absolute inset-0 w-full h-full"></div>
+          <div id="mHairOverlay" class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent pointer-events-none"></div>
+          <div id="mHairLabel" class="absolute inset-x-0 bottom-0 p-5">
+            <span class="inline-block bg-dr/70 backdrop-blur-sm text-pink-100 text-[9px] font-bold uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full mb-1.5">Peinado</span>
+            <p id="mHairName" class="font-display text-white text-lg font-bold leading-snug drop-shadow-lg"></p>
           </div>
-          <div id="mHairWrap" class="aspect-[4/5] rounded-2xl overflow-hidden bg-white shadow-md mb-4 max-h-96 mx-auto" style="max-width: 320px;"></div>
-          <p id="mHairName" class="font-display font-semibold text-gray-800 text-lg text-center"></p>
         </div>
       </div>
 
-      <!-- Personas + Recomendaciones -->
-      <div class="p-8 space-y-5">
+      <!-- FRANJA INFERIOR: personas + recomendaciones sobre fondo oscuro -->
+      <div class="shrink-0 bg-[#0e0028] border-t border-white/10 px-8 py-5">
         <div id="mPersonasBlock" class="hidden">
-          <div class="flex items-center gap-2 mb-4">
-            <div class="w-7 h-7 rounded-lg bg-emerald-500 text-white flex items-center justify-center">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            </div>
-            <h4 class="font-display font-semibold text-gray-800 text-lg">Personas programadas</h4>
-          </div>
+          <!-- director: fila propia; id="mDirRow" -->
+          <div id="mDirRow" class="hidden mb-3"></div>
+          <!-- miembros: chips compactos -->
           <div id="mPersonas" class="flex flex-wrap gap-2"></div>
         </div>
-
-        <div id="mRecomBlock" class="hidden bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-5">
-          <div class="flex items-center gap-2 mb-2">
-            <div class="w-7 h-7 rounded-lg bg-amber-500 text-white flex items-center justify-center">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            </div>
-            <h4 class="font-semibold text-amber-900 text-lg">Recomendaciones</h4>
-          </div>
-          <p id="mRecom" class="text-gray-800 leading-relaxed pl-9"></p>
+        <div id="mRecomBlock" class="hidden mt-3 pt-3 border-t border-white/10 flex items-start gap-2">
+          <svg class="w-3.5 h-3.5 text-amber-400 shrink-0 mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <p id="mRecom" class="text-amber-200/80 text-xs leading-relaxed"></p>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -1071,32 +1074,66 @@
       updatePersonasSummary();
     }
     function renderPickerPersonas() {
-      document.getElementById('pickerPersonas').innerHTML = S.personas.length
-        ? S.personas.map(p => {
+      const container = document.getElementById('pickerPersonas');
+      if (!S.personas.length) {
+        container.innerHTML = '<p class="text-center text-gray-400 text-sm py-8">Ve a "Personas" y agrega primero</p>';
+        return;
+      }
+
+      // ── Sección 1: ¿Quiénes van? ─────────────────────────────────────
+      const attendHtml = `
+        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">¿Quiénes van?</p>
+        <div class="space-y-1">
+          ${S.personas.map(p => {
             const sid = String(p.id);
             const checked = S.pickerPersonas.includes(sid);
-            const isDirector = S.pickerDirector === sid;
+            const isDir   = S.pickerDirector === sid;
             return `
-              <div class="flex items-center gap-2 p-2 rounded-lg transition-colors ${isDirector?'bg-amber-50 border border-amber-300':checked?'bg-emerald-50 border border-emerald-200':'border border-transparent hover:bg-emerald-50'}">
-                <label class="flex items-center gap-2 flex-1 cursor-pointer min-w-0">
-                  <input type="checkbox" ${checked?'checked':''} onchange="togglePersona('${p.id}')"
-                    class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-300 cursor-pointer shrink-0">
-                  <span class="text-sm font-medium ${isDirector?'text-amber-800':'text-gray-700'} truncate">${p.nombre}</span>
-                </label>
-                <button type="button" onclick="toggleDirector('${p.id}')" title="Marcar como directora"
-                  class="flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border transition-all ${isDirector?'bg-amber-500 border-amber-500 text-white shadow-sm':'bg-white border-gray-200 text-gray-400 hover:border-amber-300 hover:text-amber-500'}">
-                  <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                  ${isDirector?'Dirige':'Dirige'}
-                </button>
-              </div>`;
-          }).join('')
-        : '<p class="text-center text-gray-400 text-sm py-8">Ve a "Personas" y agrega primero</p>';
+              <button type="button" onclick="togglePersona('${p.id}')"
+                class="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl border-2 transition-all text-left
+                  ${isDir ? 'border-amber-400 bg-amber-50' : checked ? 'border-emerald-300 bg-emerald-50' : 'border-transparent bg-gray-50 hover:bg-gray-100'}">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-sm transition-all
+                  ${isDir ? 'bg-amber-500 text-white' : checked ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'}">
+                  ${isDir ? '👑' : checked ? '✓' : p.nombre.charAt(0).toUpperCase()}
+                </div>
+                <span class="flex-1 text-sm font-medium ${isDir ? 'text-amber-800' : checked ? 'text-emerald-800' : 'text-gray-600'}">${p.nombre}</span>
+                ${isDir ? '<span class="text-[9px] font-black text-amber-500 uppercase tracking-wider">Dirige</span>' : ''}
+              </button>`;
+          }).join('')}
+        </div>`;
+
+      // ── Sección 2: ¿Quién dirige? (solo los seleccionados) ───────────
+      const selected = S.personas.filter(p => S.pickerPersonas.includes(String(p.id)));
+      const dirHtml = selected.length ? `
+        <div class="mt-5 pt-4 border-t border-gray-100">
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+            <span>👑</span> ¿Quién dirige hoy?
+          </p>
+          <div class="space-y-1">
+            ${selected.map(p => {
+              const isDir = S.pickerDirector === String(p.id);
+              return `
+                <button type="button" onclick="toggleDirector('${p.id}')"
+                  class="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl border-2 transition-all text-left
+                    ${isDir ? 'border-amber-400 bg-amber-50' : 'border-transparent bg-gray-50 hover:border-amber-200 hover:bg-amber-50/60'}">
+                  <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-sm transition-all
+                    ${isDir ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-400'}">
+                    ${isDir ? '👑' : p.nombre.charAt(0).toUpperCase()}
+                  </div>
+                  <span class="flex-1 text-sm ${isDir ? 'font-bold text-amber-800' : 'font-medium text-gray-600'}">${p.nombre}</span>
+                  ${isDir ? '<span class="text-[9px] font-black text-amber-500 uppercase tracking-wider">✓ Seleccionada</span>' : ''}
+                </button>`;
+            }).join('')}
+          </div>
+        </div>` : '';
+
+      container.innerHTML = attendHtml + dirHtml;
     }
     function updatePersonasSummary() {
       const items = S.pickerPersonas.map(id => {
         const p = S.personas.find(pp => String(pp.id)===id);
         if (!p) return null;
-        return id === S.pickerDirector ? `⭐ ${p.nombre}` : p.nombre;
+        return id === S.pickerDirector ? `👑 ${p.nombre}` : p.nombre;
       }).filter(Boolean);
       document.getElementById('summaryPersonas').textContent = items.length ? items.join(', ') : 'Ninguna seleccionada';
     }
@@ -1212,53 +1249,85 @@
     function openDay(key) {
       const ev = S.calendar[key];
       if (!ev) return;
-      document.getElementById('mDate').textContent       = formatDate(key);
+
+      document.getElementById('mDate').textContent = formatDate(key);
       document.getElementById('mOutfitName').textContent = ev.uniforme_nombre;
-      document.getElementById('mHairName').textContent   = ev.peinado_nombre;
-      document.getElementById('mOutfitImg').src = outfitSrc(ev.uniforme_imagen);
 
-      // Directora en el header
-      const dirHeader = document.getElementById('mDirectorHeader');
-      if (ev.director) {
-        document.getElementById('mDirectorName').textContent = ev.director;
-        dirHeader.classList.remove('hidden');
-      } else dirHeader.classList.add('hidden');
+      // Outfit
+      const outfitImg      = document.getElementById('mOutfitImg');
+      const outfitFallback = document.getElementById('mOutfitFallback');
+      outfitImg.style.display = '';
+      outfitFallback.classList.add('hidden');
+      outfitImg.src = outfitSrc(ev.uniforme_imagen);
 
-      // Peinado: imagen o card Pinterest
-      const hairWrap = document.getElementById('mHairWrap');
+      // Peinado: imagen o Pinterest
+      const hairWrap    = document.getElementById('mHairWrap');
+      const hairOverlay = document.getElementById('mHairOverlay');
+      const hairLabel   = document.getElementById('mHairLabel');
+      document.getElementById('mHairName').textContent = ev.peinado_nombre;
+
       if (isPinterest(ev.peinado_imagen)) {
         hairWrap.innerHTML = `
-          <div class="w-full h-full bg-[#E60023] flex flex-col items-center justify-center gap-3 p-6">
-            <svg class="w-12 h-12 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+          <div class="w-full h-full bg-[#E60023] flex flex-col items-center justify-center gap-5 p-8">
+            <svg class="w-14 h-14 text-white opacity-90" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z"/></svg>
+            <p class="text-white/70 text-sm font-medium text-center px-2">${ev.peinado_nombre}</p>
             <a href="${ev.peinado_imagen}" target="_blank" rel="noopener"
-              class="bg-white text-[#E60023] text-sm font-bold px-5 py-2.5 rounded-full hover:bg-red-50 transition-colors">
+              class="bg-white text-[#E60023] text-sm font-bold px-6 py-2.5 rounded-full hover:bg-red-50 transition-colors shadow-lg">
               Ver Pin en Pinterest ↗
             </a>
           </div>`;
+        hairOverlay.classList.add('hidden');
+        hairLabel.classList.add('hidden');
       } else {
-        hairWrap.innerHTML = `<img class="w-full h-full object-cover" src="${hairSrc(ev.peinado_imagen)}" onerror="this.parentElement.innerHTML='<div class=\\'h-full bg-pink-100 flex items-center justify-center text-6xl\\'>💇</div>'">`;
+        hairWrap.innerHTML = `<img class="img-zoom w-full h-full object-cover object-top bg-pink-100" src="${hairSrc(ev.peinado_imagen)}" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full bg-pink-900 flex items-center justify-center text-8xl\\'>💇</div>'">`;
+        hairOverlay.classList.remove('hidden');
+        hairLabel.classList.remove('hidden');
       }
 
+      // Personas: director fila propia + miembros en chips
       const pb = document.getElementById('mPersonasBlock');
+      const dirRow = document.getElementById('mDirRow');
       const personasContainer = document.getElementById('mPersonas');
       if (ev.personas) {
         const names = String(ev.personas).split(',').map(s => s.trim()).filter(Boolean);
-        personasContainer.innerHTML = names.map(n => {
-          const isDir = ev.director && n === ev.director;
-          return `
-            <span class="inline-flex items-center gap-2 ${isDir?'bg-gradient-to-r from-amber-100 to-amber-50 border-2 border-amber-300':'bg-emerald-50 border border-emerald-200'} rounded-full px-4 py-2">
-              ${isDir
-                ? '<svg class="w-5 h-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>'
-                : `<span class="w-6 h-6 rounded-full bg-emerald-200 text-emerald-700 flex items-center justify-center text-xs font-bold">${n.charAt(0).toUpperCase()}</span>`}
-              <span class="text-sm font-semibold ${isDir?'text-amber-900':'text-gray-700'}">${n}${isDir?' · dirige':''}</span>
-            </span>`;
-        }).join('');
+        const members = names.filter(n => n !== ev.director);
+
+        // Fila del director
+        if (ev.director) {
+          dirRow.innerHTML = `
+            <div class="inline-flex items-center gap-3 bg-amber-500 rounded-2xl px-5 py-3 shadow-md">
+              <span class="text-2xl leading-none select-none">👑</span>
+              <div class="min-w-0">
+                <p class="text-amber-100 text-[9px] font-black uppercase tracking-[0.2em] leading-none mb-0.5">Dirige hoy</p>
+                <p class="text-white text-base font-bold leading-tight">${ev.director}</p>
+              </div>
+            </div>`;
+          dirRow.classList.remove('hidden');
+        } else {
+          dirRow.classList.add('hidden');
+        }
+
+        // Chips de miembros
+        personasContainer.innerHTML = members.map(n => `
+          <div class="flex items-center gap-2 bg-white/10 border border-white/15 rounded-xl px-3 py-2">
+            <div class="w-7 h-7 rounded-full bg-purple-700/70 flex items-center justify-center text-purple-200 font-bold text-xs shrink-0">
+              ${n.charAt(0).toUpperCase()}
+            </div>
+            <span class="text-purple-100 text-sm font-medium whitespace-nowrap">${n}</span>
+          </div>`).join('');
+
         pb.classList.remove('hidden');
-      } else pb.classList.add('hidden');
+      } else {
+        dirRow.classList.add('hidden');
+        pb.classList.add('hidden');
+      }
 
       const rb = document.getElementById('mRecomBlock');
-      if (ev.uniforme_recomendaciones) { document.getElementById('mRecom').textContent=ev.uniforme_recomendaciones; rb.classList.remove('hidden'); }
-      else rb.classList.add('hidden');
+      if (ev.uniforme_recomendaciones) {
+        document.getElementById('mRecom').textContent = ev.uniforme_recomendaciones;
+        rb.classList.remove('hidden');
+      } else rb.classList.add('hidden');
+
       show('dayModal');
     }
     function closeDay() { hide('dayModal'); }
