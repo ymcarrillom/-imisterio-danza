@@ -19,9 +19,9 @@
     }
   </script>
   <style>
-    @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
-    @keyframes spin    { to{transform:rotate(360deg)} }
+    @keyframes slideUp   { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn    { from{opacity:0} to{opacity:1} }
+    @keyframes spin      { to{transform:rotate(360deg)} }
     .anim-up   { animation: slideUp .25s ease forwards }
     .anim-fade { animation: fadeIn  .2s  ease forwards }
     .spin      { animation: spin   .8s  linear infinite }
@@ -32,6 +32,54 @@
     .img-zoom-wrap:hover .img-zoom { transform: scale(1.05); }
     @keyframes goldPulse { 0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,0)} 50%{box-shadow:0 0 18px 5px rgba(251,191,36,0.28)} }
     .director-glow { animation: goldPulse 2.5s ease-in-out infinite; }
+
+    /* Ripple en botones */
+    @keyframes rippleAnim { to { transform:scale(5); opacity:0 } }
+    .ripple-wave { position:absolute; border-radius:50%; background:rgba(255,255,255,0.38);
+      transform:scale(0); animation:rippleAnim .6s linear; pointer-events:none; }
+
+    /* Pop al seleccionar uniforme / peinado */
+    @keyframes selectPop { 0%{transform:scale(1)} 35%{transform:scale(1.12)} 70%{transform:scale(.94)} 100%{transform:scale(1)} }
+    .select-pop { animation:selectPop .35s cubic-bezier(.34,1.56,.64,1) both; }
+
+    /* Slide al cambiar pestaña admin */
+    @keyframes tabIn { from{opacity:0;transform:translateX(28px)} to{opacity:1;transform:translateX(0)} }
+    .tab-in { animation:tabIn .28s cubic-bezier(.22,1,.36,1) both; }
+
+    /* Entrada de celdas del calendario */
+    @keyframes calIn { from{opacity:0;transform:translateY(18px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+    .cal-in { animation:calIn .35s cubic-bezier(.22,1,.36,1) both; }
+
+    /* Pulso de anillo en el día de hoy */
+    @keyframes todayPulse { 0%,100%{box-shadow:0 0 0 0 rgba(107,33,168,.7)} 60%{box-shadow:0 0 0 8px rgba(107,33,168,0)} }
+    .today-ring { animation:todayPulse 1.8s ease-in-out infinite; }
+
+    /* Slide del badge de directora en el modal */
+    @keyframes badgeSlide { from{opacity:0;transform:translateX(-22px) scale(.9)} to{opacity:1;transform:translateX(0) scale(1)} }
+    .badge-slide { animation:badgeSlide .4s cubic-bezier(.22,1,.36,1) both; }
+
+    /* Escala al presionar cualquier botón */
+    button:not(:disabled):active { transform:scale(.93) !important; transition:transform .07s !important; }
+
+    /* Salto de los chips de personas */
+    @keyframes jumpIn {
+      0%   { opacity:0; transform:translateY(22px) scale(0.75); }
+      55%  { transform:translateY(-7px) scale(1.08); }
+      80%  { transform:translateY(3px) scale(0.97); }
+      100% { opacity:1; transform:translateY(0) scale(1); }
+    }
+    .jump-in { animation:jumpIn .42s cubic-bezier(.22,1,.36,1) both; }
+
+    /* Entrada de recomendaciones */
+    @keyframes recomIn {
+      0%   { opacity:0; transform:translateX(-18px) scale(0.96); }
+      100% { opacity:1; transform:translateX(0) scale(1); }
+    }
+    .recom-in { animation:recomIn .4s cubic-bezier(.22,1,.36,1) both; }
+
+    /* Pulso dorado del badge de directora */
+    @keyframes dirPulse { 0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,.5)} 50%{box-shadow:0 0 0 8px rgba(251,191,36,0)} }
+    .dir-pulse { animation:dirPulse 1.8s ease-in-out infinite; }
   </style>
 </head>
 <body class="bg-[#FAF8F5] min-h-screen font-sans text-gray-800">
@@ -48,12 +96,12 @@
         <div class="flex flex-col gap-1">
           <img src="./Conexion-C-Nueva-Imagen_Mesa-de-trabajo-1.png"
                alt="Conexión con el Cielo"
-               class="h-12 w-auto object-contain brightness-0 invert drop-shadow-sm"
-               style="max-width:220px">
-          <p class="text-purple-200/80 text-xs font-light tracking-wide pl-0.5">Calendario · Uniformes &amp; Peinados</p>
+               class="h-8 md:h-12 w-auto object-contain brightness-0 invert drop-shadow-sm"
+               style="max-width:200px">
+          <p class="hidden sm:block text-purple-200/80 text-xs font-light tracking-wide pl-0.5">Calendario · Uniformes &amp; Peinados</p>
         </div>
         <button onclick="openLogin()"
-          class="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 text-white text-sm font-medium px-4 py-2 rounded-full transition-all">
+          class="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 text-white text-xs md:text-sm font-medium px-3 md:px-4 py-2 rounded-full transition-all">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
@@ -64,11 +112,11 @@
     </header>
 
     <div class="max-w-5xl mx-auto px-4 mt-6 flex items-center justify-between">
-      <button onclick="changeMonth(-1)" class="p-2.5 rounded-full hover:bg-purple-100 text-dp transition-colors">
+      <button onclick="changeMonth(-1)" class="p-2.5 rounded-full hover:bg-purple-100 hover:scale-110 text-dp transition-all duration-150">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
       </button>
       <h2 id="monthTitle" class="font-display text-dp text-xl md:text-2xl font-semibold capitalize"></h2>
-      <button onclick="changeMonth(1)" class="p-2.5 rounded-full hover:bg-purple-100 text-dp transition-colors">
+      <button onclick="changeMonth(1)" class="p-2.5 rounded-full hover:bg-purple-100 hover:scale-110 text-dp transition-all duration-150">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
       </button>
     </div>
@@ -76,13 +124,13 @@
     <main class="max-w-5xl mx-auto px-4 mt-4 pb-12">
       <div class="bg-white rounded-2xl shadow-sm border border-purple-100 overflow-hidden">
         <div class="grid grid-cols-7 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100">
-          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Dom</div>
-          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Lun</div>
-          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Mar</div>
-          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Mié</div>
-          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Jue</div>
-          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Vie</div>
-          <div class="py-3 text-center text-xs font-semibold text-dp uppercase tracking-wider">Sáb</div>
+          <div class="py-1.5 md:py-3 text-center text-[9px] md:text-xs font-semibold text-dp uppercase tracking-wide">Dom</div>
+          <div class="py-1.5 md:py-3 text-center text-[9px] md:text-xs font-semibold text-dp uppercase tracking-wide">Lun</div>
+          <div class="py-1.5 md:py-3 text-center text-[9px] md:text-xs font-semibold text-dp uppercase tracking-wide">Mar</div>
+          <div class="py-1.5 md:py-3 text-center text-[9px] md:text-xs font-semibold text-dp uppercase tracking-wide">Mié</div>
+          <div class="py-1.5 md:py-3 text-center text-[9px] md:text-xs font-semibold text-dp uppercase tracking-wide">Jue</div>
+          <div class="py-1.5 md:py-3 text-center text-[9px] md:text-xs font-semibold text-dp uppercase tracking-wide">Vie</div>
+          <div class="py-1.5 md:py-3 text-center text-[9px] md:text-xs font-semibold text-dp uppercase tracking-wide">Sáb</div>
         </div>
         <div id="calGrid" class="grid grid-cols-7 gap-px bg-purple-100"></div>
       </div>
@@ -94,8 +142,8 @@
   ══════════════════════════════════════════ -->
   <div id="adminView" class="hidden fixed inset-0 z-40 flex anim-fade">
 
-    <!-- Sidebar -->
-    <aside class="w-60 shrink-0 bg-gradient-to-b from-purple-950 to-dp flex flex-col">
+    <!-- Sidebar (solo desktop) -->
+    <aside class="hidden md:flex w-60 shrink-0 bg-gradient-to-b from-purple-950 to-dp flex-col">
       <div class="px-6 py-6 border-b border-white/10">
         <img src="./Conexion-C-Nueva-Imagen_Mesa-de-trabajo-1.png"
              alt="Conexión con el Cielo"
@@ -140,22 +188,52 @@
 
     <!-- Main -->
     <div class="flex-1 flex flex-col bg-[#F4F0FB] overflow-hidden">
-      <div class="bg-white border-b border-gray-100 px-8 py-4 flex items-center justify-between shrink-0">
+      <div class="bg-white border-b border-gray-100 px-4 md:px-8 py-3 md:py-4 flex items-center justify-between shrink-0">
         <div>
-          <h3 id="adminTabTitle" class="font-display text-xl font-semibold text-gray-800">Programar Días</h3>
-          <p id="adminTabDesc" class="text-gray-400 text-sm mt-0.5">Asigna uniforme y peinado a cada fecha</p>
+          <h3 id="adminTabTitle" class="font-display text-base md:text-xl font-semibold text-gray-800">Programar Días</h3>
+          <p id="adminTabDesc" class="hidden md:block text-gray-400 text-sm mt-0.5">Asigna uniforme y peinado a cada fecha</p>
         </div>
-        <div class="flex items-center gap-2 text-sm text-gray-400">
-          <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
-          Conectado
+        <div class="flex items-center gap-2">
+          <!-- Botones solo en móvil -->
+          <button onclick="closeAdmin()" class="md:hidden flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"/></svg>
+            Volver
+          </button>
+          <button onclick="logout()" class="md:hidden p-1.5 rounded-lg text-red-400 hover:bg-red-50 transition-colors" title="Cerrar sesión">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </button>
+          <div class="flex items-center gap-2 text-sm text-gray-400">
+            <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+            <span class="hidden sm:inline">Conectado</span>
+          </div>
         </div>
       </div>
 
-      <div class="flex-1 overflow-y-auto thin-scroll p-8">
+      <!-- Nav móvil (solo en móvil/tablet) -->
+      <div class="md:hidden flex border-b border-gray-200 bg-white shrink-0 overflow-x-auto">
+        <button onclick="switchAdminTab('programar')" class="mob-nav flex-none flex flex-col items-center gap-0.5 px-4 py-2.5 text-[11px] font-bold text-dp border-b-2 border-dp" data-tab="programar">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Programar
+        </button>
+        <button onclick="switchAdminTab('outfits')" class="mob-nav flex-none flex flex-col items-center gap-0.5 px-4 py-2.5 text-[11px] font-semibold text-gray-400 border-b-2 border-transparent" data-tab="outfits">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+          Uniformes
+        </button>
+        <button onclick="switchAdminTab('peinados')" class="mob-nav flex-none flex flex-col items-center gap-0.5 px-4 py-2.5 text-[11px] font-semibold text-gray-400 border-b-2 border-transparent" data-tab="peinados">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Peinados
+        </button>
+        <button onclick="switchAdminTab('personas')" class="mob-nav flex-none flex flex-col items-center gap-0.5 px-4 py-2.5 text-[11px] font-semibold text-gray-400 border-b-2 border-transparent" data-tab="personas">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          Personas
+        </button>
+      </div>
+
+      <div class="flex-1 overflow-y-auto thin-scroll p-4 md:p-8">
 
         <!-- TAB: PROGRAMAR -->
         <div id="tab-programar">
-          <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
 
             <!-- Col 1: fecha + resumen -->
             <div class="space-y-5">
@@ -196,6 +274,20 @@
                   <div class="p-3 bg-emerald-50 rounded-xl">
                     <p class="text-xs text-gray-400 font-medium mb-1">Personas</p>
                     <p id="summaryPersonas" class="text-sm font-semibold text-gray-700">Ninguna seleccionada</p>
+                  </div>
+                  <div id="summaryDirBlock" class="hidden p-3 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-2">
+                    <span class="text-xl">👑</span>
+                    <div>
+                      <p id="summaryDirLabel" class="text-xs text-amber-600 font-medium">Dirige</p>
+                      <p id="summaryDirName" class="text-sm font-bold text-amber-800"></p>
+                    </div>
+                  </div>
+                  <div id="summaryDir2Block" class="hidden p-3 bg-amber-50/70 border border-amber-200/70 rounded-xl flex items-center gap-2">
+                    <span class="text-xl">👑</span>
+                    <div>
+                      <p class="text-xs text-amber-600 font-medium">Dirige · 2° Serv.</p>
+                      <p id="summaryDir2Name" class="text-sm font-bold text-amber-800"></p>
+                    </div>
                   </div>
                 </div>
                 <button onclick="saveSchedule()"
@@ -411,17 +503,17 @@
   <!-- MODAL: DETALLE DÍA -->
   <div id="dayModal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 md:p-6">
     <div class="absolute inset-0 bg-black/75 backdrop-blur-md" onclick="closeDay()"></div>
-    <div class="relative w-full max-w-5xl anim-up overflow-hidden rounded-3xl shadow-2xl flex flex-col" style="height:88vh">
+    <div class="relative w-full max-w-7xl anim-up overflow-hidden rounded-3xl shadow-2xl flex flex-col md:h-[96vh]" style="max-height:96vh">
 
       <!-- HEADER -->
-      <div class="relative bg-gradient-to-br from-[#12003e] via-purple-900 to-purple-700 px-8 py-6 overflow-hidden shrink-0">
+      <div class="relative bg-gradient-to-br from-[#12003e] via-purple-900 to-purple-700 px-4 md:px-8 py-3 md:py-4 overflow-hidden shrink-0">
         <div class="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-white/5 pointer-events-none"></div>
         <div class="absolute -bottom-5 left-1/3 w-60 h-14 bg-purple-400/10 blur-3xl rounded-full pointer-events-none"></div>
         <img src="./Conexion-C-Nueva-Imagen_Mesa-de-trabajo-1.png"
              alt="Logo"
-             class="absolute bottom-4 right-8 h-8 w-auto object-contain brightness-0 invert opacity-20 pointer-events-none select-none"
-             style="max-width:140px">
-        <button onclick="closeDay()" class="absolute top-4 right-4 p-2.5 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors backdrop-blur-sm z-10">
+             class="hidden md:block absolute bottom-3 right-8 h-12 w-auto object-contain brightness-0 invert opacity-55 pointer-events-none select-none"
+             style="max-width:200px">
+        <button onclick="closeDay()" class="absolute top-3 right-3 md:top-4 md:right-4 p-2 md:p-2.5 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors backdrop-blur-sm z-10">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
         <div class="relative pr-12">
@@ -434,40 +526,40 @@
       </div>
 
       <!-- IMÁGENES: ocupa todo el espacio restante -->
-      <div class="flex-1 min-h-0 grid grid-cols-2">
+      <div class="md:flex-1 md:min-h-0 grid grid-cols-1 md:grid-cols-2">
         <!-- Outfit -->
-        <div class="relative overflow-hidden bg-purple-950 img-zoom-wrap">
-          <img id="mOutfitImg" class="img-zoom absolute inset-0 w-full h-full object-cover object-top"
+        <div class="relative overflow-hidden bg-white img-zoom-wrap h-44 md:h-auto">
+          <img id="mOutfitImg" class="img-zoom absolute inset-0 w-full h-full object-contain"
             onerror="this.style.display='none'; document.getElementById('mOutfitFallback').classList.remove('hidden')">
-          <div id="mOutfitFallback" class="hidden absolute inset-0 bg-purple-900 flex items-center justify-center text-8xl">👗</div>
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent pointer-events-none"></div>
-          <div class="absolute inset-x-0 bottom-0 p-5">
-            <span class="inline-block bg-dp/70 backdrop-blur-sm text-purple-100 text-[9px] font-bold uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full mb-1.5">Vestuario</span>
-            <p id="mOutfitName" class="font-display text-white text-lg font-bold leading-snug drop-shadow-lg"></p>
+          <div id="mOutfitFallback" class="hidden absolute inset-0 bg-purple-100 flex items-center justify-center text-8xl">👗</div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
+          <div class="absolute inset-x-0 bottom-0 p-3 md:p-5">
+            <span class="inline-block bg-dp/80 backdrop-blur-sm text-purple-100 text-[9px] font-bold uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full mb-1">Vestuario</span>
+            <p id="mOutfitName" class="font-display text-white text-base md:text-lg font-bold leading-snug drop-shadow-lg"></p>
           </div>
         </div>
         <!-- Peinado -->
-        <div class="relative overflow-hidden bg-pink-950 img-zoom-wrap border-l border-white/10">
+        <div class="relative overflow-hidden bg-pink-950 img-zoom-wrap border-t border-white/10 md:border-t-0 md:border-l h-44 md:h-auto">
           <div id="mHairWrap" class="absolute inset-0 w-full h-full"></div>
           <div id="mHairOverlay" class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent pointer-events-none"></div>
-          <div id="mHairLabel" class="absolute inset-x-0 bottom-0 p-5">
-            <span class="inline-block bg-dr/70 backdrop-blur-sm text-pink-100 text-[9px] font-bold uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full mb-1.5">Peinado</span>
-            <p id="mHairName" class="font-display text-white text-lg font-bold leading-snug drop-shadow-lg"></p>
+          <div id="mHairLabel" class="absolute inset-x-0 bottom-0 p-3 md:p-5">
+            <span class="inline-block bg-dr/70 backdrop-blur-sm text-pink-100 text-[9px] font-bold uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full mb-1">Peinado</span>
+            <p id="mHairName" class="font-display text-white text-base md:text-lg font-bold leading-snug drop-shadow-lg"></p>
           </div>
         </div>
       </div>
 
       <!-- FRANJA INFERIOR: personas + recomendaciones sobre fondo oscuro -->
-      <div class="shrink-0 bg-[#0e0028] border-t border-white/10 px-8 py-5">
-        <div id="mPersonasBlock" class="hidden">
+      <div class="shrink-0 bg-[#0e0028] border-t border-white/10 px-4 md:px-8 py-3 max-h-[30vh] md:max-h-none overflow-y-auto thin-scroll">
+        <div id="mPersonasBlock" style="display:none">
           <!-- director: fila propia; id="mDirRow" -->
-          <div id="mDirRow" class="hidden mb-3"></div>
+          <div id="mDirRow" style="display:none" class="mb-3"></div>
           <!-- miembros: chips compactos -->
           <div id="mPersonas" class="flex flex-wrap gap-2"></div>
         </div>
-        <div id="mRecomBlock" class="hidden mt-3 pt-3 border-t border-white/10 flex items-start gap-2">
-          <svg class="w-3.5 h-3.5 text-amber-400 shrink-0 mt-px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <p id="mRecom" class="text-amber-200/80 text-xs leading-relaxed"></p>
+        <div id="mRecomBlock" style="display:none" class="mt-3 pt-3 border-t border-amber-400/40 flex items-start gap-3 bg-amber-400/20 rounded-xl px-4 py-3">
+          <svg class="w-5 h-5 text-amber-300 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <p id="mRecom" class="text-amber-100 text-base font-semibold leading-relaxed"></p>
         </div>
       </div>
 
@@ -492,7 +584,7 @@
       year:  new Date().getFullYear(),
       month: new Date().getMonth(),
       outfits: [], hairstyles: [], personas: [], calendar: {},
-      pickerOutfit: null, pickerHair: null, pickerPersonas: [], pickerDirector: null,
+      pickerOutfit: null, pickerHair: null, pickerPersonas: [], pickerDirector: null, pickerDirector2: null,
     };
 
     // API
@@ -504,8 +596,9 @@
       }
       const url = new URL(GAS_URL);
       url.searchParams.set('action', action);
+      url.searchParams.set('_t', Date.now());
       Object.entries(data).forEach(([k,v]) => url.searchParams.set(k,v));
-      return (await fetch(url.toString())).json();
+      return (await fetch(url.toString(), { cache: 'no-store' })).json();
     }
 
     // Toast
@@ -591,7 +684,6 @@
       btn.disabled = true;
       try {
         const r = await api('login', { password: pwd });
-        console.log('[LOGIN] respuesta:', r, 'pwd length:', pwd.length);
         if (r && r.success) { S.isAdmin = true; closeLogin(); openAdmin(); toast('Acceso concedido', 'success'); }
         else if (r && r.error) { const e = document.getElementById('loginErr'); e.textContent='Backend: ' + r.error; e.classList.remove('hidden'); }
         else { const e = document.getElementById('loginErr'); e.textContent='Contraseña incorrecta (resp: ' + JSON.stringify(r) + ')'; e.classList.remove('hidden'); }
@@ -625,18 +717,33 @@
 
     function switchAdminTab(tab) {
       ['programar','outfits','peinados','personas'].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.add('hidden');
+        const th = document.getElementById(`tab-${t}`);
+        th.classList.add('hidden');
+        th.classList.remove('tab-in');
         const btn = document.querySelector(`.nav-btn[data-tab="${t}"]`);
         btn.className = btn.className
           .replace('bg-white text-dp shadow-sm','')
           .replace('text-purple-200 hover:bg-white/10','')
           .trim() + ' text-purple-200 hover:bg-white/10';
       });
-      document.getElementById(`tab-${tab}`).classList.remove('hidden');
+      const tabEl = document.getElementById(`tab-${tab}`);
+      tabEl.classList.remove('hidden');
+      void tabEl.offsetWidth;
+      tabEl.classList.add('tab-in');
       const active = document.querySelector(`.nav-btn[data-tab="${tab}"]`);
       active.className = active.className
         .replace('text-purple-200 hover:bg-white/10','')
         .trim() + ' bg-white text-dp shadow-sm';
+      // Sync mobile nav buttons
+      document.querySelectorAll('.mob-nav').forEach(b => {
+        b.classList.remove('text-dp','border-dp','font-bold');
+        b.classList.add('text-gray-400','border-transparent','font-semibold');
+      });
+      const mobActive = document.querySelector(`.mob-nav[data-tab="${tab}"]`);
+      if (mobActive) {
+        mobActive.classList.remove('text-gray-400','border-transparent','font-semibold');
+        mobActive.classList.add('text-dp','border-dp','font-bold');
+      }
       document.getElementById('adminTabTitle').textContent = TAB_META[tab].title;
       document.getElementById('adminTabDesc').textContent  = TAB_META[tab].desc;
       if (tab === 'programar') { renderPickers(); renderUpcomingDays(); }
@@ -649,14 +756,14 @@
     function renderLibraryOutfits() {
       document.getElementById('outfitsList').innerHTML = S.outfits.length
         ? S.outfits.map(o => `
-          <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 group">
+          <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 group transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-purple-100">
             <img src="${outfitSrc(o.imagen)}" class="w-16 h-16 object-cover rounded-lg bg-purple-100 shrink-0" onerror="this.src='${FB_OUTFIT}'">
             <div class="min-w-0 flex-1">
               <p class="font-semibold text-gray-800">${o.nombre}</p>
               ${o.recomendaciones ? `<p class="text-xs text-gray-500 mt-1 line-clamp-2">${o.recomendaciones}</p>` : ''}
             </div>
             <button onclick="deleteOutfitItem('${o.id}','${o.nombre}')"
-              class="shrink-0 p-2 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100">
+              class="shrink-0 p-2 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
           </div>`).join('')
@@ -665,7 +772,7 @@
     function renderLibraryHair() {
       document.getElementById('hairList').innerHTML = S.hairstyles.length
         ? S.hairstyles.map(h => `
-          <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 group">
+          <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100 group transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 hover:border-pink-100">
             ${isPinterest(h.imagen)
               ? `<a href="${h.imagen}" target="_blank" rel="noopener"
                   class="w-16 h-16 rounded-lg bg-[#E60023] shrink-0 flex items-center justify-center hover:opacity-80 transition-opacity">
@@ -680,7 +787,7 @@
                 : `<p class="text-xs text-gray-400 mt-0.5 truncate">${h.imagen}</p>`}
             </div>
             <button onclick="deleteHairstyleItem('${h.id}','${h.nombre}')"
-              class="shrink-0 p-2 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100">
+              class="shrink-0 p-2 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
           </div>`).join('')
@@ -778,7 +885,7 @@
       document.getElementById('pickerOutfits').innerHTML = S.outfits.length
         ? S.outfits.map(o => `
           <div id="po-${o.id}" onclick="pickOutfit('${o.id}')"
-            class="border-2 border-transparent rounded-xl p-2 cursor-pointer hover:border-dp bg-purple-50 text-center transition-all">
+            class="border-2 border-transparent rounded-xl p-2 cursor-pointer hover:border-dp hover:shadow-md hover:-translate-y-0.5 bg-purple-50 text-center transition-all duration-200">
             <img src="${outfitSrc(o.imagen)}" class="w-full h-24 object-cover rounded-lg mb-2 bg-purple-100" onerror="this.src='${FB_OUTFIT}'">
             <p class="text-xs font-medium text-gray-700 leading-snug">${o.nombre}</p>
           </div>`).join('')
@@ -787,7 +894,7 @@
       document.getElementById('pickerHair').innerHTML = S.hairstyles.length
         ? S.hairstyles.map(h => `
           <div id="ph-${h.id}" onclick="pickHair('${h.id}')"
-            class="border-2 border-transparent rounded-xl p-2 cursor-pointer hover:border-dr bg-pink-50 text-center transition-all">
+            class="border-2 border-transparent rounded-xl p-2 cursor-pointer hover:border-dr hover:shadow-md hover:-translate-y-0.5 bg-pink-50 text-center transition-all duration-200">
             ${hairThumbHtml(h.imagen, h.nombre, 'h-24')}
             <p class="text-xs font-medium text-gray-700 leading-snug">${h.nombre}</p>
           </div>`).join('')
@@ -799,7 +906,13 @@
     function pickOutfit(id) {
       document.querySelectorAll('[id^="po-"]').forEach(el => { el.classList.remove('border-dp','bg-purple-100'); el.classList.add('border-transparent','bg-purple-50'); });
       const el = document.getElementById(`po-${id}`);
-      if (el) { el.classList.replace('border-transparent','border-dp'); el.classList.replace('bg-purple-50','bg-purple-100'); }
+      if (el) {
+        el.classList.replace('border-transparent','border-dp');
+        el.classList.replace('bg-purple-50','bg-purple-100');
+        el.classList.remove('select-pop');
+        void el.offsetWidth;
+        el.classList.add('select-pop');
+      }
       S.pickerOutfit = id;
       const o = S.outfits.find(x => String(x.id)===String(id));
       if (o) {
@@ -810,7 +923,13 @@
     function pickHair(id) {
       document.querySelectorAll('[id^="ph-"]').forEach(el => { el.classList.remove('border-dr','bg-pink-100'); el.classList.add('border-transparent','bg-pink-50'); });
       const el = document.getElementById(`ph-${id}`);
-      if (el) { el.classList.replace('border-transparent','border-dr'); el.classList.replace('bg-pink-50','bg-pink-100'); }
+      if (el) {
+        el.classList.replace('border-transparent','border-dr');
+        el.classList.replace('bg-pink-50','bg-pink-100');
+        el.classList.remove('select-pop');
+        void el.offsetWidth;
+        el.classList.add('select-pop');
+      }
       S.pickerHair = id;
       const h = S.hairstyles.find(x => String(x.id)===String(id));
       if (h) {
@@ -822,7 +941,7 @@
     }
 
     function onDateChange(date) {
-      S.pickerOutfit = null; S.pickerHair = null; S.pickerPersonas = []; S.pickerDirector = null;
+      S.pickerOutfit = null; S.pickerHair = null; S.pickerPersonas = []; S.pickerDirector = null; S.pickerDirector2 = null;
       document.querySelectorAll('[id^="po-"]').forEach(el => { el.classList.remove('border-dp','bg-purple-100'); el.classList.add('border-transparent','bg-purple-50'); });
       document.querySelectorAll('[id^="ph-"]').forEach(el => { el.classList.remove('border-dr','bg-pink-100'); el.classList.add('border-transparent','bg-pink-50'); });
       document.getElementById('summaryOutfitName').textContent = 'Sin seleccionar';
@@ -850,6 +969,13 @@
           if (d) {
             S.pickerDirector = String(d.id);
             if (!S.pickerPersonas.includes(String(d.id))) S.pickerPersonas.push(String(d.id));
+          }
+        }
+        if (ev.director2) {
+          const d2 = S.personas.find(p => p.nombre === ev.director2);
+          if (d2) {
+            S.pickerDirector2 = String(d2.id);
+            if (!S.pickerPersonas.includes(String(d2.id))) S.pickerPersonas.push(String(d2.id));
           }
         }
         updatePersonasSummary();
@@ -943,7 +1069,8 @@
         .map(id => (S.personas.find(p => String(p.id)===id) || {}).nombre)
         .filter(Boolean)
         .join(', ');
-      const directorName = (S.personas.find(p => String(p.id)===S.pickerDirector) || {}).nombre || '';
+      const directorName  = (S.personas.find(p => String(p.id)===S.pickerDirector)  || {}).nombre || '';
+      const directorName2 = (S.personas.find(p => String(p.id)===S.pickerDirector2) || {}).nombre || '';
       try {
         await api('saveDay', {
           fecha: date,
@@ -952,9 +1079,27 @@
           peinado_nombre: hair.nombre, peinado_imagen: hair.imagen,
           personas: personasNames,
           director: directorName,
+          director2: directorName2,
         });
-        toast('¡Día programado exitosamente!','success');
+        const toastMsg = directorName
+          ? `¡Día programado! 👑 ${directorName}${directorName2 ? ' · 👑 ' + directorName2 : ''}`
+          : '¡Día programado!';
+        toast(toastMsg, 'success');
+        // Actualización inmediata en memoria para que el modal muestre la corona sin esperar al servidor
+        S.calendar[date] = {
+          fecha: date,
+          uniforme_id: outfit.id, uniforme_nombre: outfit.nombre,
+          uniforme_imagen: outfit.imagen, uniforme_recomendaciones: outfit.recomendaciones||'',
+          peinado_nombre: hair.nombre, peinado_imagen: hair.imagen,
+          personas: personasNames,
+          director: directorName,
+          director2: directorName2,
+        };
         await refreshData();
+        // Si refreshData trajo datos viejos del servidor, forzar el dato correcto
+        if (!S.calendar[date] || S.calendar[date].director !== directorName) {
+          S.calendar[date] = { ...S.calendar[date], director: directorName, director2: directorName2, personas: personasNames };
+        }
         document.getElementById('existingBadge').classList.remove('hidden');
         document.getElementById('btnClearDay').classList.remove('hidden');
         renderUpcomingDays();
@@ -1037,7 +1182,7 @@
     function renderPersonasList() {
       document.getElementById('personasList').innerHTML = S.personas.length
         ? S.personas.map(p => `
-          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100 group">
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100 group transition-all duration-200 hover:shadow-sm hover:border-purple-100 hover:bg-purple-50/40">
             <div class="flex items-center gap-3">
               <div class="w-9 h-9 rounded-full bg-purple-100 text-dp flex items-center justify-center text-sm font-bold">
                 ${p.nombre.charAt(0).toUpperCase()}
@@ -1045,7 +1190,7 @@
               <p class="font-medium text-gray-700">${p.nombre}</p>
             </div>
             <button onclick="deletePersonaItem('${p.id}','${p.nombre.replace(/'/g,"\\'")}')"
-              class="p-2 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100">
+              class="p-2 rounded-lg text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
           </div>`).join('')
@@ -1065,11 +1210,16 @@
       updatePersonasSummary();
     }
     function toggleDirector(id) {
-      console.log('[toggleDirector] llamado con id=', id, 'antes:', S.pickerDirector);
       const sid = String(id);
       if (!S.pickerPersonas.includes(sid)) S.pickerPersonas.push(sid);
       S.pickerDirector = S.pickerDirector === sid ? null : sid;
-      console.log('[toggleDirector] después:', S.pickerDirector, 'personas:', S.pickerPersonas);
+      renderPickerPersonas();
+      updatePersonasSummary();
+    }
+    function toggleDirector2(id) {
+      const sid = String(id);
+      if (!S.pickerPersonas.includes(sid)) S.pickerPersonas.push(sid);
+      S.pickerDirector2 = S.pickerDirector2 === sid ? null : sid;
       renderPickerPersonas();
       updatePersonasSummary();
     }
@@ -1080,62 +1230,114 @@
         return;
       }
 
-      // ── Sección 1: ¿Quiénes van? ─────────────────────────────────────
-      const attendHtml = `
-        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">¿Quiénes van?</p>
-        <div class="space-y-1">
-          ${S.personas.map(p => {
-            const sid = String(p.id);
-            const checked = S.pickerPersonas.includes(sid);
-            const isDir   = S.pickerDirector === sid;
-            return `
-              <button type="button" onclick="togglePersona('${p.id}')"
-                class="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl border-2 transition-all text-left
-                  ${isDir ? 'border-amber-400 bg-amber-50' : checked ? 'border-emerald-300 bg-emerald-50' : 'border-transparent bg-gray-50 hover:bg-gray-100'}">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-sm transition-all
-                  ${isDir ? 'bg-amber-500 text-white' : checked ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'}">
-                  ${isDir ? '👑' : checked ? '✓' : p.nombre.charAt(0).toUpperCase()}
-                </div>
-                <span class="flex-1 text-sm font-medium ${isDir ? 'text-amber-800' : checked ? 'text-emerald-800' : 'text-gray-600'}">${p.nombre}</span>
-                ${isDir ? '<span class="text-[9px] font-black text-amber-500 uppercase tracking-wider">Dirige</span>' : ''}
-              </button>`;
-          }).join('')}
-        </div>`;
+      const dateVal  = document.getElementById('schedDate').value;
+      const isSunday = dateVal && new Date(dateVal + 'T12:00:00').getDay() === 0;
+      const selectedPersonas = S.personas.filter(p => S.pickerPersonas.includes(String(p.id)));
 
-      // ── Sección 2: ¿Quién dirige? (solo los seleccionados) ───────────
-      const selected = S.personas.filter(p => S.pickerPersonas.includes(String(p.id)));
-      const dirHtml = selected.length ? `
-        <div class="mt-5 pt-4 border-t border-gray-100">
-          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-            <span>👑</span> ¿Quién dirige hoy?
-          </p>
-          <div class="space-y-1">
-            ${selected.map(p => {
-              const isDir = S.pickerDirector === String(p.id);
+      const personaRows = S.personas.map(p => {
+        const sid     = String(p.id);
+        const isGoing = S.pickerPersonas.includes(sid);
+        const isDir   = S.pickerDirector === sid;
+        return `
+          <div class="flex items-center gap-2 px-3 py-2 rounded-xl border-2 transition-all duration-150
+            ${isDir ? 'border-amber-400 bg-amber-50' : isGoing ? 'border-emerald-300 bg-emerald-50' : 'border-gray-100 bg-gray-50'}">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-sm transition-all
+              ${isDir ? 'bg-amber-500 text-white' : isGoing ? 'bg-emerald-500 text-white' : 'bg-gray-200 text-gray-500'}">
+              ${isDir ? '👑' : isGoing ? '✓' : p.nombre.charAt(0).toUpperCase()}
+            </div>
+            <span class="flex-1 text-sm font-medium truncate
+              ${isDir ? 'text-amber-800 font-bold' : isGoing ? 'text-emerald-800' : 'text-gray-600'}">${p.nombre}</span>
+            <button type="button" onclick="togglePersona('${p.id}')" title="Asistencia"
+              class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all shrink-0
+                ${isGoing ? 'bg-emerald-500 text-white shadow-sm' : 'bg-gray-100 text-gray-400 hover:bg-emerald-100 hover:text-emerald-600'}">
+              ✓
+            </button>
+            <button type="button" onclick="toggleDirector('${p.id}')" title="${isSunday ? '1° servicio' : 'Dirige'}"
+              class="w-8 h-8 rounded-lg flex items-center justify-center text-base leading-none transition-all shrink-0
+                ${isDir ? 'bg-amber-500 text-white shadow-md scale-110' : 'bg-gray-100 text-gray-300 hover:bg-amber-100 hover:text-amber-500'}">
+              👑
+            </button>
+          </div>`;
+      }).join('');
+
+      let dir2Section = '';
+      if (isSunday) {
+        const dir2Rows = selectedPersonas.length
+          ? selectedPersonas.map(p => {
+              const sid    = String(p.id);
+              const isDir2 = S.pickerDirector2 === sid;
               return `
-                <button type="button" onclick="toggleDirector('${p.id}')"
-                  class="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl border-2 transition-all text-left
-                    ${isDir ? 'border-amber-400 bg-amber-50' : 'border-transparent bg-gray-50 hover:border-amber-200 hover:bg-amber-50/60'}">
+                <div class="flex items-center gap-2 px-3 py-2 rounded-xl border-2 transition-all duration-150
+                  ${isDir2 ? 'border-amber-400 bg-amber-50' : 'border-gray-100 bg-gray-50'}">
                   <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-sm transition-all
-                    ${isDir ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-400'}">
-                    ${isDir ? '👑' : p.nombre.charAt(0).toUpperCase()}
+                    ${isDir2 ? 'bg-amber-500 text-white' : 'bg-gray-200 text-gray-500'}">
+                    ${isDir2 ? '👑' : p.nombre.charAt(0).toUpperCase()}
                   </div>
-                  <span class="flex-1 text-sm ${isDir ? 'font-bold text-amber-800' : 'font-medium text-gray-600'}">${p.nombre}</span>
-                  ${isDir ? '<span class="text-[9px] font-black text-amber-500 uppercase tracking-wider">✓ Seleccionada</span>' : ''}
-                </button>`;
-            }).join('')}
-          </div>
-        </div>` : '';
+                  <span class="flex-1 text-sm font-medium truncate ${isDir2 ? 'text-amber-800 font-bold' : 'text-gray-600'}">${p.nombre}</span>
+                  <button type="button" onclick="toggleDirector2('${p.id}')" title="2° servicio"
+                    class="w-8 h-8 rounded-lg flex items-center justify-center text-base leading-none transition-all shrink-0
+                      ${isDir2 ? 'bg-amber-500 text-white shadow-md scale-110' : 'bg-gray-100 text-gray-300 hover:bg-amber-100 hover:text-amber-500'}">
+                    👑
+                  </button>
+                </div>`;
+            }).join('')
+          : '<p class="text-xs text-gray-400 text-center py-2">Selecciona personas arriba primero</p>';
+        dir2Section = `
+          <div class="mt-4 border-t border-amber-200/50 pt-3">
+            <p class="text-[10px] font-bold text-amber-600 uppercase tracking-widest mb-2 px-1 flex items-center gap-1.5">
+              <span>👑</span> 2° Servicio · domingo
+            </p>
+            <div class="space-y-1.5">${dir2Rows}</div>
+          </div>`;
+      }
 
-      container.innerHTML = attendHtml + dirHtml;
+      container.innerHTML = `
+        <div class="flex items-center justify-between mb-3 px-1">
+          <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Personas</p>
+          <div class="flex items-center gap-3 text-[10px] text-gray-400 font-semibold">
+            <span class="flex items-center gap-1"><span class="text-emerald-500">✓</span> Va</span>
+            <span class="flex items-center gap-1"><span>👑</span> ${isSunday ? '1° Serv.' : 'Dirige'}</span>
+          </div>
+        </div>
+        <div class="space-y-1.5">${personaRows}</div>
+        ${dir2Section}`;
     }
     function updatePersonasSummary() {
       const items = S.pickerPersonas.map(id => {
         const p = S.personas.find(pp => String(pp.id)===id);
         if (!p) return null;
-        return id === S.pickerDirector ? `👑 ${p.nombre}` : p.nombre;
+        if (id === S.pickerDirector && id === S.pickerDirector2) return `👑👑 ${p.nombre}`;
+        if (id === S.pickerDirector)  return `👑 ${p.nombre}`;
+        if (id === S.pickerDirector2) return `👑 ${p.nombre} (2°)`;
+        return p.nombre;
       }).filter(Boolean);
       document.getElementById('summaryPersonas').textContent = items.length ? items.join(', ') : 'Ninguna seleccionada';
+
+      // Bloque director 1
+      const dirBlock = document.getElementById('summaryDirBlock');
+      const dirLabel = document.getElementById('summaryDirLabel');
+      if (S.pickerDirector) {
+        const dir = S.personas.find(p => String(p.id) === S.pickerDirector);
+        if (dir) {
+          document.getElementById('summaryDirName').textContent = dir.nombre;
+          dirLabel.textContent = S.pickerDirector2 ? 'Dirige · 1° Serv.' : 'Dirige';
+          dirBlock.classList.remove('hidden');
+        }
+      } else {
+        dirBlock.classList.add('hidden');
+      }
+
+      // Bloque director 2
+      const dir2Block = document.getElementById('summaryDir2Block');
+      if (S.pickerDirector2) {
+        const dir2 = S.personas.find(p => String(p.id) === S.pickerDirector2);
+        if (dir2) {
+          document.getElementById('summaryDir2Name').textContent = dir2.nombre;
+          dir2Block.classList.remove('hidden');
+        }
+      } else {
+        dir2Block.classList.add('hidden');
+      }
     }
 
     // Próximos días programados
@@ -1147,14 +1349,14 @@
         .sort((a,b) => a.fecha.localeCompare(b.fecha));
       document.getElementById('upcomingDays').innerHTML = upcoming.length
         ? upcoming.map(ev => `
-          <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 group">
+          <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100 group transition-all duration-200 hover:shadow-sm hover:-translate-y-0.5 hover:border-dp/20 hover:bg-purple-50/50">
             <div class="w-12 h-12 rounded-lg overflow-hidden bg-purple-100 shrink-0">
               <img src="${outfitSrc(ev.uniforme_imagen)}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'h-full flex items-center justify-center text-xl\\'>👗</div>'">
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-sm font-semibold text-gray-700 capitalize">${formatDate(ev.fecha)}</p>
               <p class="text-xs text-gray-500 truncate">${ev.uniforme_nombre} · ${ev.peinado_nombre}</p>
-              ${ev.director ? `<p class="text-xs text-amber-600 truncate mt-0.5">⭐ Dirige: ${ev.director}</p>` : ''}
+              ${ev.director ? `<p class="text-xs text-amber-600 truncate mt-0.5">👑 ${ev.director}${ev.director2 ? ` · 👑 ${ev.director2}` : ''}</p>` : ev.director2 ? `<p class="text-xs text-amber-600 truncate mt-0.5">👑 ${ev.director2} (2°)</p>` : ''}
               ${ev.personas ? `<p class="text-xs text-emerald-600 truncate mt-0.5">👥 ${ev.personas}</p>` : ''}
             </div>
             <button onclick="loadDayForEdit('${ev.fecha}')" class="p-2 rounded-lg text-gray-400 hover:text-dp hover:bg-purple-50 transition-colors" title="Editar">
@@ -1175,7 +1377,6 @@
       if (!confirm(`¿Eliminar la programación del ${formatDate(fecha)}?`)) return;
       try {
         const r = await api('deleteDay', { fecha });
-        console.log('[DELETE] fecha=' + fecha + ' resp:', r);
         if (!r || !r.success) { toast('Backend: ' + JSON.stringify(r),'error'); return; }
         delete S.calendar[fecha];
         toast('Programación eliminada','info');
@@ -1193,20 +1394,28 @@
       const days     = new Date(S.year, S.month+1, 0).getDate();
       const today    = new Date();
       const isNow    = today.getMonth()===S.month && today.getFullYear()===S.year;
-      for (let i=0; i<firstDay; i++) { const c=document.createElement('div'); c.className='bg-gray-50/40 min-h-32 md:min-h-36'; grid.appendChild(c); }
+      for (let i=0; i<firstDay; i++) { const c=document.createElement('div'); c.className='bg-gray-50/40 min-h-[4.5rem] md:min-h-32'; grid.appendChild(c); }
       for (let d=1; d<=days; d++) {
         const key = `${S.year}-${String(S.month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
         const ev  = S.calendar[key];
         const isToday = isNow && today.getDate()===d;
         const cell = document.createElement('div');
-        cell.className = `bg-white min-h-32 md:min-h-36 p-2 flex flex-col transition-all duration-200 ${ev?'cursor-pointer hover:shadow-md hover:-translate-y-0.5 group':''}`;
+        cell.className = `bg-white min-h-[4.5rem] md:min-h-32 p-1.5 md:p-2 flex flex-col transition-all duration-200 cal-in ${ev?'cursor-pointer hover:shadow-2xl hover:-translate-y-2 hover:ring-4 hover:ring-purple-400/50 hover:bg-purple-50/60 group':''}`;
+        cell.style.animationDelay = `${d * 0.015}s`;
         if (ev) cell.onclick = () => openDay(key);
         cell.innerHTML = `
           <div class="flex items-center justify-between">
-            <span class="${isToday?'w-7 h-7 rounded-full bg-dp text-white flex items-center justify-center text-sm font-bold':'text-sm font-semibold text-gray-400'}">${d}</span>
-            ${ev?'<span class="w-2 h-2 rounded-full bg-dp/50 group-hover:bg-dp transition-colors"></span>':''}
+            <span class="${isToday?'w-6 h-6 md:w-7 md:h-7 rounded-full bg-dp text-white flex items-center justify-center text-xs font-bold today-ring':'text-xs font-semibold text-gray-400'}">${d}</span>
+            ${ev?'<span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-dp/50 group-hover:bg-dp transition-colors"></span>':''}
           </div>
-          ${ev?`<div class="flex-1 flex flex-col gap-1 mt-1.5 overflow-hidden">
+          ${ev?`<div class="md:hidden flex-1 flex flex-col gap-0.5 mt-1 min-h-0">
+            <div class="flex gap-0.5 flex-1">
+              <div class="flex-1 rounded bg-purple-200 opacity-70 min-h-[1.5rem]"></div>
+              <div class="flex-1 rounded bg-pink-200 opacity-70 min-h-[1.5rem]"></div>
+            </div>
+            ${(ev.director || ev.director2) ? `<span class="text-center text-[10px] leading-none">${ev.director ? '👑' : ''}${ev.director2 ? '👑' : ''}</span>` : ''}
+          </div>
+          <div class="hidden md:flex flex-1 flex-col gap-1 mt-1.5 overflow-hidden">
             <div class="grid grid-cols-2 gap-1 flex-1 min-h-[4rem]">
               <div class="rounded-lg overflow-hidden bg-purple-100">
                 <img src="${outfitSrc(ev.uniforme_imagen)}" class="w-full h-full object-cover"
@@ -1218,8 +1427,13 @@
                   : `<img src="${hairSrc(ev.peinado_imagen)}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'h-full flex items-center justify-center text-xl\\'>💇</div>'">`}
               </div>
             </div>
-            ${ev.director ? `<div class="bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5">
-              <p class="text-[10px] font-semibold text-amber-700 truncate leading-tight">⭐ ${ev.director}</p>
+            ${ev.director ? `<div class="bg-amber-400/20 border border-amber-400/60 rounded-lg px-2 py-1 flex items-center gap-1.5">
+              <span class="text-base leading-none shrink-0">👑</span>
+              <p class="text-[11px] font-bold text-amber-700 truncate leading-tight">${ev.director}${ev.director2 ? ' · 1°' : ''}</p>
+            </div>` : ''}
+            ${ev.director2 ? `<div class="bg-amber-400/15 border border-amber-400/40 rounded-lg px-2 py-1 flex items-center gap-1.5">
+              <span class="text-sm leading-none shrink-0">👑</span>
+              <p class="text-[11px] font-bold text-amber-600 truncate leading-tight">${ev.director2} · 2°</p>
             </div>` : ''}
             ${ev.personas ? `<div class="bg-emerald-50 border border-emerald-100 rounded px-1.5 py-0.5">
               <p class="text-[10px] font-medium text-emerald-700 truncate leading-tight">👥 ${ev.personas}</p>
@@ -1253,6 +1467,7 @@
       document.getElementById('mDate').textContent = formatDate(key);
       document.getElementById('mOutfitName').textContent = ev.uniforme_nombre;
 
+
       // Outfit
       const outfitImg      = document.getElementById('mOutfitImg');
       const outfitFallback = document.getElementById('mOutfitFallback');
@@ -1279,7 +1494,7 @@
         hairOverlay.classList.add('hidden');
         hairLabel.classList.add('hidden');
       } else {
-        hairWrap.innerHTML = `<img class="img-zoom w-full h-full object-cover object-top bg-pink-100" src="${hairSrc(ev.peinado_imagen)}" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full bg-pink-900 flex items-center justify-center text-8xl\\'>💇</div>'">`;
+        hairWrap.innerHTML = `<img class="img-zoom w-full h-full object-contain bg-pink-950" src="${hairSrc(ev.peinado_imagen)}" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full bg-pink-900 flex items-center justify-center text-8xl\\'>💇</div>'">`;
         hairOverlay.classList.remove('hidden');
         hairLabel.classList.remove('hidden');
       }
@@ -1288,45 +1503,61 @@
       const pb = document.getElementById('mPersonasBlock');
       const dirRow = document.getElementById('mDirRow');
       const personasContainer = document.getElementById('mPersonas');
+
+      // Director(es) — siempre verificar independientemente de personas
+      if (ev.director || ev.director2) {
+        let dirHtml = '';
+        if (ev.director) {
+          const lbl = ev.director2 ? '· 1° Servicio' : '· Dirige';
+          dirHtml += `
+            <div class="jump-in inline-flex items-center gap-3 bg-amber-500/25 border-2 border-amber-400/60 rounded-2xl px-4 py-2.5 dir-pulse">
+              <span class="text-2xl leading-none select-none">👑</span>
+              <span class="text-amber-100 text-base font-bold">${ev.director}</span>
+              <span class="text-amber-400 text-[10px] font-black uppercase tracking-wider">${lbl}</span>
+            </div>`;
+        }
+        if (ev.director2) {
+          dirHtml += `
+            <div class="jump-in inline-flex items-center gap-3 bg-amber-500/20 border-2 border-amber-400/40 rounded-2xl px-4 py-2.5" style="animation-delay:0.12s">
+              <span class="text-2xl leading-none select-none">👑</span>
+              <span class="text-amber-100 text-base font-bold">${ev.director2}</span>
+              <span class="text-amber-400 text-[10px] font-black uppercase tracking-wider">· 2° Servicio</span>
+            </div>`;
+        }
+        dirRow.innerHTML = `<div class="flex flex-wrap gap-2">${dirHtml}</div>`;
+        dirRow.style.display = 'block';
+      } else {
+        dirRow.style.display = 'none';
+      }
+
+      // Chips de miembros
       if (ev.personas) {
         const names = String(ev.personas).split(',').map(s => s.trim()).filter(Boolean);
         const members = names.filter(n => n !== ev.director);
-
-        // Fila del director
-        if (ev.director) {
-          dirRow.innerHTML = `
-            <div class="inline-flex items-center gap-3 bg-amber-500 rounded-2xl px-5 py-3 shadow-md">
-              <span class="text-2xl leading-none select-none">👑</span>
-              <div class="min-w-0">
-                <p class="text-amber-100 text-[9px] font-black uppercase tracking-[0.2em] leading-none mb-0.5">Dirige hoy</p>
-                <p class="text-white text-base font-bold leading-tight">${ev.director}</p>
-              </div>
-            </div>`;
-          dirRow.classList.remove('hidden');
-        } else {
-          dirRow.classList.add('hidden');
-        }
-
-        // Chips de miembros
-        personasContainer.innerHTML = members.map(n => `
-          <div class="flex items-center gap-2 bg-white/10 border border-white/15 rounded-xl px-3 py-2">
-            <div class="w-7 h-7 rounded-full bg-purple-700/70 flex items-center justify-center text-purple-200 font-bold text-xs shrink-0">
+        personasContainer.innerHTML = members.map((n, i) => `
+          <div class="flex items-center gap-2 bg-white/10 border border-white/20 rounded-xl px-3 py-2 jump-in" style="animation-delay:${i * 0.07}s">
+            <div class="w-8 h-8 rounded-full bg-purple-600/80 flex items-center justify-center text-white font-bold text-sm shrink-0">
               ${n.charAt(0).toUpperCase()}
             </div>
-            <span class="text-purple-100 text-sm font-medium whitespace-nowrap">${n}</span>
+            <span class="text-purple-100 text-sm font-semibold whitespace-nowrap">${n}</span>
           </div>`).join('');
-
-        pb.classList.remove('hidden');
       } else {
-        dirRow.classList.add('hidden');
-        pb.classList.add('hidden');
+        personasContainer.innerHTML = '';
       }
+
+      // Mostrar bloque si hay director O hay personas
+      pb.style.display = (ev.director || ev.director2 || ev.personas) ? 'block' : 'none';
 
       const rb = document.getElementById('mRecomBlock');
       if (ev.uniforme_recomendaciones) {
         document.getElementById('mRecom').textContent = ev.uniforme_recomendaciones;
-        rb.classList.remove('hidden');
-      } else rb.classList.add('hidden');
+        rb.classList.remove('recom-in');
+        rb.style.display = 'flex';
+        void rb.offsetWidth;
+        rb.classList.add('recom-in');
+      } else {
+        rb.style.display = 'none';
+      }
 
       show('dayModal');
     }
@@ -1346,6 +1577,21 @@
       loadAndRender();
     });
     document.addEventListener('keydown', e => { if (e.key==='Escape') { closeDay(); closeLogin(); } });
+
+    // Ripple en botones
+    document.addEventListener('click', function(e) {
+      const btn = e.target.closest('button');
+      if (!btn || btn.disabled) return;
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height) * 2.5;
+      const wave = document.createElement('span');
+      wave.className = 'ripple-wave';
+      wave.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px`;
+      if (getComputedStyle(btn).position === 'static') btn.style.position = 'relative';
+      btn.style.overflow = 'hidden';
+      btn.appendChild(wave);
+      wave.addEventListener('animationend', () => wave.remove());
+    });
   </script>
 </body>
 </html>

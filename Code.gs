@@ -117,8 +117,8 @@ function addHairstyle(data) {
 }
 
 // ── Calendario ────────────────────────────────────────────────────────────
-const CAL_HEADERS = ['fecha', 'uniforme_id', 'uniforme_nombre', 'uniforme_imagen', 'uniforme_recomendaciones', 'peinado_nombre', 'peinado_imagen', 'personas', 'director'];
-const CAL_KEYS    = ['fecha', 'uniforme_id', 'uniforme_nombre', 'uniforme_imagen', 'uniforme_recomendaciones', 'peinado_nombre', 'peinado_imagen', 'personas', 'director'];
+const CAL_HEADERS = ['fecha', 'uniforme_id', 'uniforme_nombre', 'uniforme_imagen', 'uniforme_recomendaciones', 'peinado_nombre', 'peinado_imagen', 'personas', 'director', 'director2'];
+const CAL_KEYS    = ['fecha', 'uniforme_id', 'uniforme_nombre', 'uniforme_imagen', 'uniforme_recomendaciones', 'peinado_nombre', 'peinado_imagen', 'personas', 'director', 'director2'];
 
 function normalizeFecha(v) {
   if (v && typeof v.getFullYear === 'function') {
