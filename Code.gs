@@ -120,21 +120,26 @@ function addHairstyle(data) {
 const CAL_HEADERS = ['fecha', 'uniforme_id', 'uniforme_nombre', 'uniforme_imagen', 'uniforme_recomendaciones', 'peinado_nombre', 'peinado_imagen', 'personas', 'director', 'director2'];
 const CAL_KEYS    = ['fecha', 'uniforme_id', 'uniforme_nombre', 'uniforme_imagen', 'uniforme_recomendaciones', 'peinado_nombre', 'peinado_imagen', 'personas', 'director', 'director2'];
 
+// Zona horaria de la hoja (ej. America/Bogota). Se usa para que una celda de
+// tipo Fecha se lea SIEMPRE en el mismo día en que se guardó, sin importar la
+// zona horaria del proyecto Apps Script. Cacheada para no reabrir la hoja.
+let _tz = null;
+function getTZ() {
+  if (!_tz) _tz = SpreadsheetApp.openById(SPREADSHEET_ID).getSpreadsheetTimeZone();
+  return _tz;
+}
+
 function normalizeFecha(v) {
+  // Celda de tipo Fecha: formatear en la zona horaria de la hoja (evita el
+  // desfase de un día que borraba la agenda antes de tiempo).
   if (v && typeof v.getFullYear === 'function') {
-    const y = v.getFullYear();
-    const m = String(v.getMonth() + 1).padStart(2, '0');
-    const d = String(v.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
+    return Utilities.formatDate(v, getTZ(), 'yyyy-MM-dd');
   }
   const s = String(v || '');
   if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.substring(0, 10);
   const d = new Date(s);
   if (d && !isNaN(d.getTime())) {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const da = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${da}`;
+    return Utilities.formatDate(d, getTZ(), 'yyyy-MM-dd');
   }
   return s;
 }
@@ -311,8 +316,9 @@ function deletePersona(id) {
 function pruneOldDays() {
   const sheet = getSheet('calendario', CAL_HEADERS);
   const values = sheet.getDataRange().getValues();
-  const today = new Date();
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  // "Hoy" en la zona horaria de la hoja. Solo se borra lo ESTRICTAMENTE
+  // anterior a hoy (fecha < hoy), así el día actual se mantiene hasta que pase.
+  const todayStr = Utilities.formatDate(new Date(), getTZ(), 'yyyy-MM-dd');
   let removed = 0;
   for (let i = values.length - 1; i >= 1; i--) {
     const fecha = normalizeFecha(values[i][0]);
